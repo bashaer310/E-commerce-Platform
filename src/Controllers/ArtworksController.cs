@@ -21,28 +21,6 @@ namespace Backend_Teamwork.src.Controllers
             _artworkService = service;
         }
 
-        // Create
-        // End-Point: api/v1/artworks
-        [HttpPost]
-        [Authorize(Roles = "Artist")]
-        public async Task<ActionResult<ArtworkReadDto>> CreateOne(
-            [FromBody] ArtworkCreateDto createDto
-        )
-        {
-            // extract user information
-            var authenticateClaims = HttpContext.User;
-            // get user id from claim
-            var userId = authenticateClaims
-                .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
-                .Value;
-            // string => guid
-            var userGuid = new Guid(userId);
-
-            var createdArtwork = await _artworkService.CreateOneAsync(userGuid, createDto);
-            //return Created(url, createdArtwork);
-            return Ok(createdArtwork);
-        }
-
         // Get all
         // End-Point: api/v1/artworks
         [HttpGet]
@@ -51,7 +29,10 @@ namespace Backend_Teamwork.src.Controllers
         )
         {
             var artworkList = await _artworkService.GetAllAsync(paginationOptions);
-            return Ok(artworkList);
+            var totalCount = await _artworkService.GetCountAsync();
+
+            var artworkResponse = new { ArtworkList = artworkList, TotalCount = totalCount };
+            return Ok(artworkResponse);
         }
 
         // Get by artwork id
@@ -72,6 +53,28 @@ namespace Backend_Teamwork.src.Controllers
         {
             var artwork = await _artworkService.GetByArtistIdAsync(artistId);
             return Ok(artwork);
+        }
+
+        // Create
+        // End-Point: api/v1/artworks
+        [HttpPost]
+        [Authorize(Roles = "Artist")]
+        public async Task<ActionResult<ArtworkReadDto>> CreateOne(
+            [FromBody] ArtworkCreateDto createDto
+        )
+        {
+            // extract user information
+            var authenticateClaims = HttpContext.User;
+            // get user id from claim
+            var userId = authenticateClaims
+                .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
+                .Value;
+            // string => guid
+            var userGuid = new Guid(userId);
+
+            var createdArtwork = await _artworkService.CreateOneAsync(userGuid, createDto);
+            //return Created(url, createdArtwork);
+            return Ok(createdArtwork);
         }
 
         // Update

@@ -27,36 +27,23 @@ namespace Backend_Teamwork.src.Services.artwork
             _mapper = mapper;
         }
 
-        public async Task<ArtworkReadDto> CreateOneAsync(Guid artistId, ArtworkCreateDto createDto)
-        {
-            var foundCategory = await _categoryRepo.GetByIdAsync(createDto.CategoryId);
-            if (foundCategory == null)
-            {
-                throw CustomException.NotFound($"Category with id: {createDto.CategoryId} not found");
-            }
-            var artwork = _mapper.Map<ArtworkCreateDto, Artwork>(createDto);
-            artwork.UserId = artistId;
-            var createdArtwork = await _artworkRepo.CreateOneAsync(artwork);
-            return _mapper.Map<Artwork, ArtworkReadDto>(createdArtwork);
-        }
-
         public async Task<List<ArtworkReadDto>> GetAllAsync(PaginationOptions paginationOptions)
         {
             // Validate pagination options
             if (paginationOptions.PageSize <= 0)
             {
-                throw CustomException.BadRequest("PageSize should be greater than 0.");
+                throw CustomException.BadRequest("PageSize should be greater than 0");
             }
 
             if (paginationOptions.PageNumber <= 0)
             {
-                throw CustomException.BadRequest("PageNumber should be greater than 0.");
+                throw CustomException.BadRequest("PageNumber should be greater than 0");
             }
 
             var artworkList = await _artworkRepo.GetAllAsync(paginationOptions);
-            if (artworkList == null || !artworkList.Any())
+            if (artworkList == null)
             {
-                throw CustomException.NotFound("No artworks found.");
+                throw CustomException.NotFound("No artworks found");
             }
             return _mapper.Map<List<Artwork>, List<ArtworkReadDto>>(artworkList);
         }
@@ -90,16 +77,26 @@ namespace Backend_Teamwork.src.Services.artwork
             return artworkList;
         }
 
-        public async Task<bool> DeleteOneAsync(Guid id)
+         // count artworks
+        public async Task<int> GetCountAsync()
         {
-            var foundArtwork = await _artworkRepo.GetByIdAsync(id);
-            if (foundArtwork == null)
-            {
-                throw CustomException.NotFound($"Artwork with id: {id} not found");
-            }
-            bool isDeleted = await _artworkRepo.DeleteOneAsync(foundArtwork);
+            return await _artworkRepo.GetCountAsync();
+        }
 
-            return isDeleted;
+
+        public async Task<ArtworkReadDto> CreateOneAsync(Guid artistId, ArtworkCreateDto createDto)
+        {
+            var foundCategory = await _categoryRepo.GetByIdAsync(createDto.CategoryId);
+            if (foundCategory == null)
+            {
+                throw CustomException.NotFound(
+                    $"Category with id: {createDto.CategoryId} not found"
+                );
+            }
+            var artwork = _mapper.Map<ArtworkCreateDto, Artwork>(createDto);
+            artwork.UserId = artistId;
+            var createdArtwork = await _artworkRepo.CreateOneAsync(artwork);
+            return _mapper.Map<Artwork, ArtworkReadDto>(createdArtwork);
         }
 
         public async Task<ArtworkReadDto> UpdateOneAsync(Guid id, ArtworkUpdateDTO updateDto)
@@ -113,6 +110,16 @@ namespace Backend_Teamwork.src.Services.artwork
             _mapper.Map(updateDto, foundArtwork);
             var updatedArtwork = await _artworkRepo.UpdateOneAsync(foundArtwork);
             return _mapper.Map<Artwork, ArtworkReadDto>(updatedArtwork);
+        }
+
+        public async Task DeleteOneAsync(Guid id)
+        {
+            var foundArtwork = await _artworkRepo.GetByIdAsync(id);
+            if (foundArtwork == null)
+            {
+                throw CustomException.NotFound($"Artwork with id: {id} not found");
+            }
+            await _artworkRepo.DeleteOneAsync(foundArtwork);
         }
     }
 }

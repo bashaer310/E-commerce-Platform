@@ -20,22 +20,27 @@ namespace Backend_Teamwork.src.Entities
         ]
         public required string Description { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Quantity should be greater than zero.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity should be greater than zero")]
         public int Quantity { get; set; }
 
-        [Range(1.0, double.MaxValue, ErrorMessage = "Price should be greater than zero.")]
+        [Range(1.0, double.MaxValue, ErrorMessage = "Price should be greater than zero")]
         public decimal Price { get; set; }
+
+        [
+            Required(ErrorMessage = "Url shouldn't be null"),
+            MinLength(30, ErrorMessage = "Url should be at at least 30 characters"),
+        ]
+        public required string ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
 
         [Required(ErrorMessage = "User Id shouldn't be null")]
-        public Guid UserId { get; set; }
+        public required Guid UserId { get; set; }
         public User User { get; set; } = null!;
 
         [Required(ErrorMessage = "Category Id shouldn't be null")]
-        public Guid CategoryId { get; set; }
+        public required  Guid CategoryId { get; set; }
         public Category Category { get; set; } = null!;
 
-        // OrderDetails
         public List<OrderDetails>? OrderDetails { get; set; }
     }
 }

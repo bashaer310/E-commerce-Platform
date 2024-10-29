@@ -8,10 +8,10 @@ namespace Backend_Teamwork.src.Utils
         public int PageNumber { get; set; } = 1;
 
         // Search
-        public string Search { get; set; } = string.Empty;
+        public string? Search { get; set; } = null;
 
-        // Sort
-        public string SortOrder { get; set; } = string.Empty;// "", "name_desc", "date_desc", "date", "price_desc", "price"
+        // Sort ("", "name_desc", "date_desc", "date", "price_desc", "price")
+        public string? SortOrder { get; set; } = null; 
 
         // Price range
         public decimal? LowPrice { get; set; } = 0;

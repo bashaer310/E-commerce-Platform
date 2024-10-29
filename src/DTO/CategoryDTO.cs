@@ -11,7 +11,7 @@ namespace Backend_Teamwork.src.DTO
                 MinLength(2, ErrorMessage = "Name should be at at least 2 characters"),
                 MaxLength(10, ErrorMessage = "Name shouldn't be more than 10 characters")
             ]
-            public string Name { get; set; }
+            public required string Name { get; set; }
         }
 
         public class CategoryUpdateDto
@@ -21,7 +21,7 @@ namespace Backend_Teamwork.src.DTO
                 MinLength(2, ErrorMessage = "Name should be at at least 2 characters"),
                 MaxLength(10, ErrorMessage = "Name shouldn't be more than 10 characters")
             ]
-            public string Name { get; set; }
+            public required string Name { get; set; }
         }
 
         public class CategoryReadDto

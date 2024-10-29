@@ -43,6 +43,23 @@ builder.Services.AddScoped<IOrderService, OrderService>().AddScoped<OrderReposit
 builder.Services.AddScoped<IWorkshopService, WorkshopService>().AddScoped<WorkshopRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>().AddScoped<BookingRepository>();
 
+//add cors
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials();
+        }
+    );
+});
 
 //add logic for authentication
 builder
@@ -91,8 +108,6 @@ app.MapGet("/", () => "Server is running");
 //Convert to Timestamp format
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-//
-
 //test database connection
 using (var scope = app.Services.CreateScope())
 {
@@ -114,6 +129,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 app.UseHttpsRedirection();
+
+//use cors
+app.UseCors(MyAllowSpecificOrigins);
 
 //use middleware
 app.UseMiddleware<ErrorHandlerMiddleware>();
