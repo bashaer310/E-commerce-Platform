@@ -18,7 +18,6 @@ namespace Backend_Teamwork.src.Entities
         [Required(ErrorMessage = "User Id shouldn't be null")]
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
-        public Payment? Payment { get; set; }
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

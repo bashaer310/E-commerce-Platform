@@ -11,7 +11,6 @@ namespace Backend_Teamwork.src.Services.booking
     {
         private readonly BookingRepository _bookingRepository;
         private readonly WorkshopRepository _workshopRepository;
-        private readonly PaymentRepository _paymentRepository;
 
         private readonly IMapper _mapper;
 

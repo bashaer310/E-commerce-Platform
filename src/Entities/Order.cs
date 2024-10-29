@@ -23,6 +23,5 @@ namespace Backend_Teamwork.src.Entities
 
         [Required(ErrorMessage = "Order details shouldn't be null")]
         public List<OrderDetails> OrderDetails { get; set; }
-        public Payment? Payment { get; set; }
     }
 }

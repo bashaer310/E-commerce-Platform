@@ -43,8 +43,6 @@ builder.Services.AddScoped<IOrderService, OrderService>().AddScoped<OrderReposit
 builder.Services.AddScoped<IWorkshopService, WorkshopService>().AddScoped<WorkshopRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>().AddScoped<BookingRepository>();
 
-//builder.Services.AddScoped<IPaymentService, IPaymentService>().AddScoped<PaymentRepository>();
-
 
 //add logic for authentication
 builder

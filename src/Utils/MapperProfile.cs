@@ -5,7 +5,6 @@ using static Backend_Teamwork.src.DTO.BookingDTO;
 using static Backend_Teamwork.src.DTO.CategoryDTO;
 using static Backend_Teamwork.src.DTO.OrderDetailDTO;
 using static Backend_Teamwork.src.DTO.OrderDTO;
-using static Backend_Teamwork.src.DTO.PaymentDTO;
 using static Backend_Teamwork.src.DTO.UserDTO;
 using static Backend_Teamwork.src.DTO.WorkshopDTO;
 
@@ -44,13 +43,6 @@ namespace Backend_Teamwork.src.Utils
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User));
             CreateMap<OrderCreateDto, Order>();
             CreateMap<OrderUpdateDto, Order>()
-                .ForAllMembers(opts =>
-                    opts.Condition((src, dest, srcProperty) => srcProperty != null)
-                );
-
-            CreateMap<Payment, PaymentReadDTO>();
-            CreateMap<PaymentCreateDTO, Payment>();
-            CreateMap<PaymentReadDTO, Payment>()
                 .ForAllMembers(opts =>
                     opts.Condition((src, dest, srcProperty) => srcProperty != null)
                 );
