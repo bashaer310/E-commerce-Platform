@@ -34,40 +34,38 @@ namespace Backend_Teamwork.src.Repository
                     .ToList();
             }
 
-            // get by price range
-            if (
-                (paginationOptions.LowPrice.HasValue && paginationOptions.LowPrice > 0)
-                & (paginationOptions.HighPrice.HasValue && paginationOptions.LowPrice > 0)
-            )
+            // get by low price
+            if (paginationOptions.LowPrice.HasValue && paginationOptions.LowPrice > 0)
             {
-                artworks = artworks
-                    .Where(a =>
-                        a.Price >= paginationOptions.LowPrice
-                        && a.Price <= paginationOptions.HighPrice
-                    )
-                    .ToList();
+                artworks = artworks.Where(a => a.Price >= paginationOptions.LowPrice).ToList();
             }
 
-            // pagination
-            artworks = artworks
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .ToList();
+            // get by high price
+            if (paginationOptions.HighPrice.HasValue && paginationOptions.HighPrice > 0)
+            {
+                artworks = artworks.Where(a => a.Price <= paginationOptions.HighPrice).ToList();
+            }
 
             // sort by title, date, or price
             if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
             {
                 artworks = paginationOptions.SortOrder switch
                 {
-                    "name_desc" => artworks.OrderByDescending(a => a.Title).ToList(),
+                    "title_desc" => artworks.OrderByDescending(a => a.Title).ToList(),
                     "date" => artworks.OrderBy(a => a.CreatedAt).ToList(),
                     "date_desc" => artworks.OrderByDescending(a => a.CreatedAt).ToList(),
                     "price" => artworks.OrderBy(a => a.Price).ToList(),
                     "price_desc" => artworks.OrderByDescending(a => a.Price).ToList(),
-                    // name ascending
+                    // title ascending
                     _ => artworks.OrderBy(a => a.Title).ToList(),
                 };
             }
+
+             // pagination
+            artworks = artworks
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize)
+                .ToList();
 
             return artworks;
         }
