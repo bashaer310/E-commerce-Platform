@@ -6,7 +6,6 @@ namespace Backend_Teamwork.src.DTO
 {
     public class UserDTO
     {
-        // DTO for creating a new User (including Artist)
         public class UserCreateDto
         {
             [
@@ -37,11 +36,7 @@ namespace Backend_Teamwork.src.DTO
             ]
             public string Password { get; set; }
 
-            [Required(ErrorMessage = "Role shouldn't be null")]
-            public UserRole Role { get; set; } = UserRole.Customer; // Default to Customer
-
-            // Artist-specific properties (optional)
-            public string? Description { get; set; } // Nullable, only for Artists
+            public string? Description { get; set; }
         }
 
         public class UserSigninDto
@@ -56,20 +51,6 @@ namespace Backend_Teamwork.src.DTO
             public string Password { get; set; }
         }
 
-        // DTO for reading User data (including Artist)
-        public class UserReadDto
-        {
-            public Guid Id { get; set; }
-            public string? Name { get; set; }
-            public string? PhoneNumber { get; set; }
-            public string? Email { get; set; }
-            public UserRole Role { get; set; }
-
-            // Artist-specific properties (optional)
-            public string? Description { get; set; } // Nullable, only for Artists
-        }
-
-        // DTO for updating an existing User (including Artist)
         [AtLeastOneRequired(ErrorMessage = "At least one property must be updated.")]
         public class UserUpdateDto
         {
@@ -93,6 +74,16 @@ namespace Backend_Teamwork.src.DTO
 
             [MinLength(2, ErrorMessage = "Description should be at at least 2 characters")]
             public string? Description { get; set; }
+        }
+
+        public class UserReadDto
+        {
+            public Guid Id { get; set; }
+            public string? Name { get; set; }
+            public string? PhoneNumber { get; set; }
+            public string? Email { get; set; }
+            public UserRole Role { get; set; }
+            public string? Description { get; set; } 
         }
     }
 }

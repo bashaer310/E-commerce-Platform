@@ -37,7 +37,7 @@ namespace Backend_Teamwork.src.Controllers
 
         // Get by artwork id
         // End-Point: api/v1/artworks/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<ArtworkReadDto>> GetById([FromRoute] Guid id)
         {
             var artwork = await _artworkService.GetByIdAsync(id);
@@ -46,7 +46,7 @@ namespace Backend_Teamwork.src.Controllers
 
         // Get by artist Id
         // End-Point: api/v1/artworks/artist/{id}
-        [HttpGet("artist/{artistId}")]
+        [HttpGet("artist/{artistId:guid}")]
         public async Task<ActionResult<List<ArtworkReadDto>>> GetByArtistId(
             [FromRoute] Guid artistId
         )
@@ -79,7 +79,7 @@ namespace Backend_Teamwork.src.Controllers
 
         // Update
         // End-Point: api/v1/artworks/{id}
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin,Artist")]
         public async Task<ActionResult> UpdateOne(
             [FromRoute] Guid id,
@@ -92,7 +92,7 @@ namespace Backend_Teamwork.src.Controllers
 
         // Delete
         // End-Point: api/v1/artworks/{id}
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin,Artist")]
         public async Task<ActionResult> DeleteOne([FromRoute] Guid id)
         {

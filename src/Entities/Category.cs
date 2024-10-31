@@ -11,6 +11,6 @@ namespace Backend_Teamwork.src.Entities
             MinLength(2, ErrorMessage = "Name should be at at least 2 characters"),
             MaxLength(10, ErrorMessage = "Name shouldn't be more than 10 characters")
         ]
-        public required string Name { set; get; }
+        public string Name { set; get; }
     }
 }

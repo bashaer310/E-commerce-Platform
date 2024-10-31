@@ -52,24 +52,13 @@ namespace Backend_Teamwork.src.Services.user
             return await _userRepository.GetCountAsync();
         }
 
-        // Creates a new user
-        public async Task<UserReadDto> CreateOneAsync(UserCreateDto createDto)
+        public async Task<UserReadDto> CreateOneAsync(UserCreateDto createDto, UserRole userRole)
         {
-            if (createDto == null)
+            var isExisted = await _userRepository.GetByEmailAsync(createDto.Email);
+            if (isExisted != null)
             {
-                throw CustomException.BadRequest("User data cannot be null.");
+                throw CustomException.BadRequest("Email is already in use");
             }
-            if (
-                createDto
-                    .Role.ToString()
-                    .Equals(UserRole.Admin.ToString(), StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                throw CustomException.UnAuthorized(
-                    "Only admin users can create other admin accounts."
-                );
-            }
-            // Hash password before saving to the database
             PasswordUtils.HashPassword(
                 createDto.Password,
                 out string hashedPassword,
@@ -78,13 +67,10 @@ namespace Backend_Teamwork.src.Services.user
             var user = _mapper.Map<UserCreateDto, User>(createDto);
             user.Password = hashedPassword;
             user.Salt = salt;
+            user.Role = userRole;
 
-            var UserCreated = await _userRepository.CreateOneAsync(user);
-            if (UserCreated == null)
-            {
-                throw CustomException.BadRequest("Failed to create user.");
-            }
-            return _mapper.Map<User, UserReadDto>(UserCreated);
+            var createdUser = await _userRepository.CreateOneAsync(user);
+            return _mapper.Map<User, UserReadDto>(createdUser);
         }
 
         //-----------------------------------------------------

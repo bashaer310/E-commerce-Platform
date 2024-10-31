@@ -16,7 +16,6 @@ namespace Backend_Teamwork.src.Repository
             _artwork = databaseContext.Set<Artwork>();
         }
 
-        // get all artworks
         public async Task<List<Artwork>> GetAllAsync(PaginationOptions paginationOptions)
         {
             //get all
@@ -70,7 +69,6 @@ namespace Backend_Teamwork.src.Repository
             return artworks;
         }
 
-        // get artwork by id
         public async Task<Artwork?> GetByIdAsync(Guid id)
         {
             return await _artwork
@@ -79,35 +77,29 @@ namespace Backend_Teamwork.src.Repository
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        // get by artistId
         public async Task<List<Artwork>> GetByArtistIdAsync(Guid id)
         {
             return await _artwork.Include(a => a.Category).Where(a => a.UserId == id).ToListAsync();
         }
 
-        // count artworks
         public async Task<int> GetCountAsync()
         {
             return await _artwork.CountAsync();
         }
 
-        // create artwork
         public async Task<Artwork?> CreateOneAsync(Artwork newArtwork)
         {
             await _artwork.AddAsync(newArtwork);
             await _databaseContext.SaveChangesAsync();
-            // return newArtwork;
             return await GetByIdAsync(newArtwork.Id);
         }
 
-        // delete artwork
         public async Task DeleteOneAsync(Artwork artwork)
         {
             _artwork.Remove(artwork);
             await _databaseContext.SaveChangesAsync();
         }
 
-        // update artwork
         public async Task<Artwork?> UpdateOneAsync(Artwork updateArtwork)
         {
             _artwork.Update(updateArtwork);

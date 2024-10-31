@@ -41,7 +41,7 @@ namespace Backend_Teamwork.src.Controllers
         }
 
         [HttpGet("page")]
-        public async Task<ActionResult<List<CategoryReadDto>>> GetCategoriesWithPaginationAsync(
+        public async Task<ActionResult<List<CategoryReadDto>>> GetCategoriesWithPagination(
             [FromQuery] PaginationOptions paginationOptions
         )
         {
