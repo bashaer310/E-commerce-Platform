@@ -41,6 +41,12 @@ namespace Backend_Teamwork.src.Entities
 
         [Required(ErrorMessage = "Availability shouldn't be null")]
         public bool Availability { get; set; }
+
+        [
+            Required(ErrorMessage = "Url shouldn't be null"),
+            MinLength(30, ErrorMessage = "Url should be at at least 30 characters"),
+        ]
+        public string ImageUrl { get; set; }
         public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "User Id shouldn't be null")]

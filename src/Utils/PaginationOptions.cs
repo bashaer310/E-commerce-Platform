@@ -16,5 +16,10 @@ namespace Backend_Teamwork.src.Utils
         // Price range
         public decimal? LowPrice { get; set; } = 0;
         public decimal? HighPrice { get; set; } = 10000;
+
+        //  Availability
+        public bool? IsAvailable { get; set; } = false;
+
+
     }
 }

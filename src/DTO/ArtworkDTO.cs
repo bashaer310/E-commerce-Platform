@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Backend_Teamwork.src.Entities;
 using Backend_Teamwork.src.Utils;
-
 using static Backend_Teamwork.src.DTO.UserDTO;
 
 namespace Backend_Teamwork.src.DTO
@@ -62,9 +61,7 @@ namespace Backend_Teamwork.src.DTO
             [Range(1.0, double.MaxValue, ErrorMessage = "Price should be greater than zero.")]
             public decimal Price { get; set; }
 
-            [
-                MinLength(30, ErrorMessage = "Url should be at at least 30 characters"),
-            ]
+            [MinLength(30, ErrorMessage = "Url should be at at least 30 characters")]
             public string ImageUrl { get; set; }
         }
 

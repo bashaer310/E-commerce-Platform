@@ -55,12 +55,11 @@ namespace Backend_Teamwork.src.Repository
                     "date_desc" => artworks.OrderByDescending(a => a.CreatedAt).ToList(),
                     "price" => artworks.OrderBy(a => a.Price).ToList(),
                     "price_desc" => artworks.OrderByDescending(a => a.Price).ToList(),
-                    // title ascending
                     _ => artworks.OrderBy(a => a.Title).ToList(),
                 };
             }
 
-             // pagination
+             //apply pagination
             artworks = artworks
                 .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
                 .Take(paginationOptions.PageSize)

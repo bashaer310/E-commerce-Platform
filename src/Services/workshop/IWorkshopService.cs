@@ -9,7 +9,8 @@ namespace Backend_Teamwork.src.Services.workshop
         Task<List<WorkshopReadDTO?>> GetAllAsync();
         Task<List<WorkshopReadDTO>> GetAllAsync(PaginationOptions paginationOptions);
         Task<WorkshopReadDTO?> GetByIdAsync(Guid id);
-        Task<bool> DeleteOneAsync(Guid id);
-        Task<bool> UpdateOneAsync(Guid id, WorkshopUpdateDTO updateworkshopDto);
+        Task<int> GetCountAsync();
+        Task DeleteOneAsync(Guid id);
+        Task<WorkshopReadDTO?> UpdateOneAsync(Guid id, WorkshopUpdateDTO updateworkshopDto);
     }
 }

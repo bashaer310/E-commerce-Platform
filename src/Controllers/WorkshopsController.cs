@@ -25,7 +25,7 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
             return Ok(workshops);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<WorkshopReadDTO>> GetWorkshopById([FromRoute] Guid id)
         {
             var workshop = await _workshopService.GetByIdAsync(id);
@@ -37,8 +37,11 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
             [FromQuery] PaginationOptions paginationOptions
         )
         {
-            var workshops = await _workshopService.GetAllAsync(paginationOptions);
-            return Ok(workshops);
+            var workshopList = await _workshopService.GetAllAsync(paginationOptions);
+            var totalCount = await _workshopService.GetCountAsync();
+
+            var workshopResponse = new { WorkshopList = workshopList, TotalCount = totalCount };
+            return Ok(workshopResponse);
         }
 
         [HttpPost]
@@ -47,34 +50,31 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
             [FromBody] WorkshopCreateDTO createDto
         )
         {
-            // extract user information
             var authenticateClaims = HttpContext.User;
-            // get user id from claim
             var userId = authenticateClaims
                 .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
                 .Value;
-            // string => guid
             var userGuid = new Guid(userId);
 
             var workshopCreated = await _workshopService.CreateOneAsync(userGuid, createDto);
             return CreatedAtAction(
-                nameof(GetWorkshopById),
+                nameof(CreateWorkshop),
                 new { id = workshopCreated.Id },
                 workshopCreated
             );
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin,Artist")]
-        public async Task<ActionResult<bool>> DeleteWorkshop([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteWorkshop([FromRoute] Guid id)
         {
-            var isDeleted = await _workshopService.DeleteOneAsync(id);
+            await _workshopService.DeleteOneAsync(id);
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin,Artist")]
-        public async Task<ActionResult<bool>> UpdateWorkshop(
+        public async Task<ActionResult<WorkshopReadDTO>> UpdateWorkshop(
             Guid id,
             [FromBody] WorkshopUpdateDTO updateDto
         )

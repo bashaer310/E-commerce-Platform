@@ -43,17 +43,18 @@ namespace Backend_Teamwork.src.Services.workshop
             // Validate pagination options
             if (paginationOptions.PageSize <= 0)
             {
-                throw CustomException.BadRequest("Page Size should be greater than 0.");
+                throw CustomException.BadRequest("Page Size should be greater than 0");
             }
 
-            if (paginationOptions.PageNumber < 0)
+            if (paginationOptions.PageNumber <= 0)
             {
-                throw CustomException.BadRequest("Page Number should be 0 or greater.");
+                throw CustomException.BadRequest("Page Number should be greater than 0");
             }
+
             var workshopList = await _workshopRepo.GetAllAsync(paginationOptions);
-            if (workshopList == null || !workshopList.Any())
+            if (workshopList == null)
             {
-                throw CustomException.NotFound("Workshops not found");
+                throw CustomException.NotFound("No workshops found");
             }
             return _mapper.Map<List<Workshop>, List<WorkshopReadDTO>>(workshopList);
         }
@@ -68,26 +69,34 @@ namespace Backend_Teamwork.src.Services.workshop
             return _mapper.Map<Workshop, WorkshopReadDTO>(foundworkshop);
         }
 
-        public async Task<bool> DeleteOneAsync(Guid id)
+        public async Task<int> GetCountAsync()
         {
-            var foundworkshop = await _workshopRepo.GetByIdAsync(id);
-            if (foundworkshop == null)
-            {
-                throw CustomException.NotFound($"Workshop with ID {id} not found.");
-            }
-            return await _workshopRepo.DeleteOneAsync(foundworkshop);
-            ;
+            return await _workshopRepo.GetCountAsync();
         }
 
-        public async Task<bool> UpdateOneAsync(Guid id, WorkshopUpdateDTO workshopupdateDto)
+        public async Task DeleteOneAsync(Guid id)
         {
             var foundworkshop = await _workshopRepo.GetByIdAsync(id);
             if (foundworkshop == null)
             {
                 throw CustomException.NotFound($"Workshop with ID {id} not found.");
             }
-            _mapper.Map(workshopupdateDto, foundworkshop);
-            return await _workshopRepo.UpdateOneAsync(foundworkshop);
+            await _workshopRepo.DeleteOneAsync(foundworkshop);
+        }
+
+        public async Task<WorkshopReadDTO> UpdateOneAsync(
+            Guid id,
+            WorkshopUpdateDTO workshopupdateDto
+        )
+        {
+            var foundWorkshop = await _workshopRepo.GetByIdAsync(id);
+            if (foundWorkshop == null)
+            {
+                throw CustomException.NotFound($"Workshop with ID {id} not found.");
+            }
+            _mapper.Map(workshopupdateDto, foundWorkshop);
+            var createdWorkshop = await _workshopRepo.UpdateOneAsync(foundWorkshop);
+            return _mapper.Map<Workshop, WorkshopReadDTO>(createdWorkshop);
         }
     }
 }
