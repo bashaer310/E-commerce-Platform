@@ -82,14 +82,13 @@ namespace Backend_Teamwork.src.Controllers
             return CreatedAtAction(nameof(SignUpCustomer), new { id = user.Id }, user);
         }
 
-        /*[HttpPost("create-admin")]
+        [HttpPost("create-admin")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserReadDto>> CreateAdmin([FromBody] UserCreateDto createDto)
         {
-            //createDto.Role = UserRole.Admin; // Set role as 'Admin'
-            var adminCreated = await _userService.CreateOneAsync(createDto);
-            return CreatedAtAction(nameof(GetUserById), new { id = adminCreated.Id }, adminCreated);
-        }*/
+            var user = await _userService.CreateOneAsync(createDto, UserRole.Admin);
+            return CreatedAtAction(nameof(CreateAdmin), new { id = user.Id }, user);
+        }
 
         [HttpPost("signin")]
         public async Task<ActionResult<string>> SignIn([FromBody] UserSigninDto signinDto)

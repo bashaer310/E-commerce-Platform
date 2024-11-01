@@ -194,11 +194,6 @@ namespace Backend_Teamwork.src.Services.user
         // Signs in a user with their credentials
         public async Task<string> SignInAsync(UserSigninDto signinDto)
         {
-            if (signinDto == null)
-            {
-                throw CustomException.BadRequest("User data cannot be null.");
-            }
-
             var foundUser = await _userRepository.GetByEmailAsync(signinDto.Email);
             if (foundUser == null)
             {
