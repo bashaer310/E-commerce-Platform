@@ -29,6 +29,19 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(users);
         }
 
+        [HttpGet("artist")]
+        public async Task<ActionResult<List<UserReadDto>>> GetArtists(
+            [FromQuery] PaginationOptions paginationOptions
+        )
+        {
+            paginationOptions.Search = UserRole.Artist.ToString();
+            var artistList = await _userService.GetAllAsync(paginationOptions);
+            var totalCount = await _userService.GetTotalUsersCountAsync();
+
+            var artistResponse = new { ArtistList = artistList, TotalCount = totalCount };
+            return Ok(artistResponse);
+        }
+
         [HttpGet("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserReadDto>> GetUserById([FromRoute] Guid id)

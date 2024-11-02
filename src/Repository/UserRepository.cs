@@ -18,25 +18,41 @@ namespace Backend_Teamwork.src.Repository
 
         public async Task<List<User>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            var userQuery = _user.Where(a =>
-                a.Name.ToLower().Contains(paginationOptions.Search.ToLower())
-                || a.Email.ToLower().Contains(paginationOptions.Search.ToLower())
-                || a.PhoneNumber.Contains(paginationOptions.Search)
-            );
+            //get all
+            var users = _user.ToList();
 
-            userQuery = paginationOptions.SortOrder switch
+            //get by name, email, phoneNumber or role
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
-                "name_desc" => userQuery.OrderByDescending(a => a.Name),
-                "email_desc" => userQuery.OrderByDescending(a => a.Email),
-                "email_asc" => userQuery.OrderBy(a => a.Email),
-                _ => userQuery.OrderBy(a => a.Name),
-            };
-            
-            userQuery = userQuery
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize);
+                users = users
+                    .Where(u =>
+                        u.Name.ToLower().Contains(paginationOptions.Search.ToLower())
+                        || u.Email.ToLower().Contains(paginationOptions.Search.ToLower())
+                        || u.PhoneNumber.Contains(paginationOptions.Search)
+                        || u.Role.ToString().ToLower().Contains(paginationOptions.Search.ToLower())
+                    )
+                    .ToList();
+            }
 
-            return await userQuery.ToListAsync();
+            //sort by name or email
+            if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
+            {
+                users = paginationOptions.SortOrder switch
+                {
+                    "name_desc" => users.OrderByDescending(a => a.Name).ToList(),
+                    "email_desc" => users.OrderByDescending(a => a.Email).ToList(),
+                    "email_asc" => users.OrderBy(a => a.Email).ToList(),
+                    _ => users.OrderBy(a => a.Name).ToList(),
+                };
+            }
+
+            //apply pagination
+            users = users
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize)
+                .ToList();
+
+            return users;
         }
 
         public async Task<int> GetCountAsync()

@@ -31,7 +31,7 @@ namespace Backend_Teamwork.src.Services.workshop
         public async Task<List<WorkshopReadDTO>> GetAllAsync()
         {
             var workshopList = await _workshopRepo.GetAllAsync();
-            if (workshopList == null || !workshopList.Any())
+            if (workshopList == null)
             {
                 throw CustomException.NotFound("Workshops not found");
             }

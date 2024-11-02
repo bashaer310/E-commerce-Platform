@@ -59,7 +59,7 @@ namespace Backend_Teamwork.src.Repository
                 };
             }
 
-             //apply pagination
+            //apply pagination
             artworks = artworks
                 .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
                 .Take(paginationOptions.PageSize)

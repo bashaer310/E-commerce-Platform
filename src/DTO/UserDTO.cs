@@ -35,8 +35,8 @@ namespace Backend_Teamwork.src.DTO
                 MinLength(8, ErrorMessage = "Password should be at at least 8 characters")
             ]
             public string Password { get; set; }
-
-            public string? Description { get; set; }
+            public string? Bio { set; get; }
+            public string? ImageUrl { get; set; }
         }
 
         public class UserSigninDto
@@ -72,8 +72,8 @@ namespace Backend_Teamwork.src.DTO
             [MinLength(8, ErrorMessage = "Password should be at at least 8 characters")]
             public string? Password { get; set; }
 
-            [MinLength(2, ErrorMessage = "Description should be at at least 2 characters")]
-            public string? Description { get; set; }
+            public string? Bio { set; get; }
+            public string? ImageUrl { get; set; }
         }
 
         public class UserReadDto
@@ -83,7 +83,8 @@ namespace Backend_Teamwork.src.DTO
             public string? PhoneNumber { get; set; }
             public string? Email { get; set; }
             public UserRole Role { get; set; }
-            public string? Description { get; set; } 
+            public string? Bio { set; get; }
+            public string? ImageUrl { get; set; }
         }
     }
 }

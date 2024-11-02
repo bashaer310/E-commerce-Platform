@@ -24,7 +24,6 @@ namespace Backend_Teamwork.src.Services.user
             _mapper = mapper;
         }
 
-        // Retrieves all users
         public async Task<List<UserReadDto>> GetAllAsync(PaginationOptions paginationOptions)
         {
             // Validate pagination options
@@ -39,14 +38,13 @@ namespace Backend_Teamwork.src.Services.user
             }
 
             var UserList = await _userRepository.GetAllAsync(paginationOptions);
-            if (!UserList.Any() || UserList == null)
+            if (UserList == null)
             {
                 throw CustomException.NotFound($"Users not found");
             }
             return _mapper.Map<List<User>, List<UserReadDto>>(UserList);
         }
 
-        // Gets the total count of users
         public async Task<int> GetTotalUsersCountAsync()
         {
             return await _userRepository.GetCountAsync();
@@ -73,9 +71,6 @@ namespace Backend_Teamwork.src.Services.user
             return _mapper.Map<User, UserReadDto>(createdUser);
         }
 
-        //-----------------------------------------------------
-
-        // Retrieves a user by their ID (Admin,customer,artist)
         public async Task<UserReadDto> GetByIdAsync(Guid userId)
         {
             var foundUser = await _userRepository.GetByIdAsync(userId);
@@ -86,9 +81,6 @@ namespace Backend_Teamwork.src.Services.user
             return _mapper.Map<User, UserReadDto>(foundUser);
         }
 
-        //-----------------------------------------------------
-
-        // Deletes a user by their ID
         public async Task<bool> DeleteOneAsync(Guid id)
         {
             if (id == Guid.Empty)
@@ -111,9 +103,6 @@ namespace Backend_Teamwork.src.Services.user
             return DeletedUser;
         }
 
-        //-----------------------------------------------------
-
-        // Updates a user by their ID
         public async Task<bool> UpdateOneAsync(Guid id, UserUpdateDto updateDto)
         {
             if (id == Guid.Empty)
@@ -157,9 +146,6 @@ namespace Backend_Teamwork.src.Services.user
             return updatedUser;
         }
 
-        //-----------------------------------------------------
-
-        // Retrieves a user by their email
         public async Task<UserReadDto> GetByEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -174,7 +160,6 @@ namespace Backend_Teamwork.src.Services.user
             return _mapper.Map<User, UserReadDto>(user);
         }
 
-        // Retrieves a user by their phone number
         public async Task<UserReadDto> GetByPhoneNumberAsync(string phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -191,7 +176,6 @@ namespace Backend_Teamwork.src.Services.user
             ;
         }
 
-        // Signs in a user with their credentials
         public async Task<string> SignInAsync(UserSigninDto signinDto)
         {
             var foundUser = await _userRepository.GetByEmailAsync(signinDto.Email);

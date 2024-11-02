@@ -17,10 +17,8 @@ namespace Backend_Teamwork.src.Utils
             CreateMap<User, UserReadDto>();
             CreateMap<UserCreateDto, User>();
             CreateMap<UserUpdateDto, User>()
-                .ForMember(
-                    dest => dest.Description,
-                    opt => opt.Condition(src => src.Description != null)
-                )
+                .ForMember(dest => dest.Bio, opt => opt.Condition(src => src.Bio == null))
+                .ForMember(dest => dest.ImageUrl, opt => opt.Condition(src => src.ImageUrl == null))
                 .ForAllMembers(opts =>
                     opts.Condition((src, dest, srcProperty) => srcProperty != null)
                 );
@@ -61,7 +59,10 @@ namespace Backend_Teamwork.src.Utils
                 );
 
             CreateMap<Booking, BookingReadDto>();
-            CreateMap<BookingCreateDto, Booking>();
+            CreateMap<BookingCreateDto, Booking>()
+                .ForAllMembers(opts =>
+                    opts.Condition((src, dest, srcProperty) => srcProperty != null)
+                );
         }
     }
 }

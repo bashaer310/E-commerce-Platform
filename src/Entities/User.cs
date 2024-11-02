@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-
 namespace Backend_Teamwork.src.Entities
 {
     public class User
@@ -35,10 +34,11 @@ namespace Backend_Teamwork.src.Entities
             MinLength(8, ErrorMessage = "Password should be at at least 8 characters")
         ]
         public string Password { get; set; }
-        public string? Description { set; get; }
+        public string? Bio { set; get; }
+        public string? ImageUrl { get; set; }
 
         [Required(ErrorMessage = "Salt shouldn't be null")]
-        public byte[]? Salt { get; set; }
+        public byte[] Salt { get; set; }
 
         [Required(ErrorMessage = "Role shouldn't be null")]
         public UserRole Role { get; set; } = UserRole.Customer;
