@@ -100,6 +100,7 @@ namespace Backend_Teamwork.src.DTO
             public decimal Price { get; set; }
             public int Capacity { get; set; }
             public bool Availability { get; set; }
+            public string ImageUrl { get; set; }
             public DateTime CreatedAt { get; set; }
             public User User { get; set; }
         }
