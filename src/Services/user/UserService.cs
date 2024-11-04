@@ -81,7 +81,7 @@ namespace Backend_Teamwork.src.Services.user
             return _mapper.Map<User, UserReadDto>(foundUser);
         }
 
-        public async Task<bool> DeleteOneAsync(Guid id)
+        public async Task DeleteOneAsync(Guid id)
         {
             if (id == Guid.Empty)
             {
@@ -92,18 +92,10 @@ namespace Backend_Teamwork.src.Services.user
             {
                 throw CustomException.NotFound($"User with ID {id} not found.");
             }
-            var DeletedUser = await _userRepository.DeleteOneAsync(foundUser);
-
-            // Check if the delete was successful
-            if (!DeletedUser)
-            {
-                throw CustomException.BadRequest("Failed to delete user.");
-            }
-
-            return DeletedUser;
+            await _userRepository.DeleteOneAsync(foundUser);
         }
 
-        public async Task<bool> UpdateOneAsync(Guid id, UserUpdateDto updateDto)
+        public async Task<UserReadDto> UpdateOneAsync(Guid id, UserUpdateDto updateDto)
         {
             if (id == Guid.Empty)
             {
@@ -136,14 +128,7 @@ namespace Backend_Teamwork.src.Services.user
             }
 
             var updatedUser = await _userRepository.UpdateOneAsync(foundUser);
-
-            // Check if the update was successful
-            if (!updatedUser)
-            {
-                throw CustomException.BadRequest("Failed to update user.");
-            }
-
-            return updatedUser;
+            return _mapper.Map<User, UserReadDto>(updatedUser);
         }
 
         public async Task<UserReadDto> GetByEmailAsync(string email)

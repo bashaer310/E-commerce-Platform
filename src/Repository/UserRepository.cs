@@ -60,11 +60,11 @@ namespace Backend_Teamwork.src.Repository
             return await _user.CountAsync();
         }
 
-        public async Task<User> CreateOneAsync(User newUser)
+        public async Task<User> CreateOneAsync(User user)
         {
-            await _user.AddAsync(newUser);
+            await _user.AddAsync(user);
             await _databaseContext.SaveChangesAsync();
-            return newUser;
+            return user;
         }
 
         public async Task<User?> GetByIdAsync(Guid id)
@@ -72,22 +72,17 @@ namespace Backend_Teamwork.src.Repository
             return await _user.FindAsync(id);
         }
 
-        public async Task<bool> DeleteOneAsync(User User)
+        public async Task DeleteOneAsync(User User)
         {
-            if (User == null)
-                return false;
             _user.Remove(User);
             await _databaseContext.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<bool> UpdateOneAsync(User updateUser)
+        public async Task<User?> UpdateOneAsync(User user)
         {
-            if (updateUser == null)
-                return false;
-            _user.Update(updateUser);
+            _user.Update(user);
             await _databaseContext.SaveChangesAsync();
-            return true;
+            return user;
         }
 
         public async Task<User?> GetByEmailAsync(string email)

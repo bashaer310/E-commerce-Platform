@@ -13,7 +13,7 @@ namespace Backend_Teamwork.src.Services.user
         Task<int> GetTotalUsersCountAsync();
         Task<UserReadDto> CreateOneAsync(UserCreateDto createDto, UserRole userRole);
         Task<string> SignInAsync(UserSigninDto createDto);
-        Task<bool> DeleteOneAsync(Guid id);
-        Task<bool> UpdateOneAsync(Guid id, UserUpdateDto updateDto);
+        Task DeleteOneAsync(Guid id);
+        Task<UserReadDto> UpdateOneAsync(Guid id, UserUpdateDto updateDto);
     }
 }

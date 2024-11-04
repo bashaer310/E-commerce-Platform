@@ -126,20 +126,20 @@ namespace Backend_Teamwork.src.Controllers
 
         [HttpPut("update-profile")]
         [Authorize]
-        public async Task<ActionResult<bool>> UpdateProfileInformation(
+        public async Task<ActionResult<UserReadDto>> UpdateProfileInformation(
             [FromBody] UserUpdateDto updateDto
         )
         {
             var authClaims = HttpContext.User;
             var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             var convertedUserId = new Guid(userId);
-            await _userService.UpdateOneAsync(convertedUserId, updateDto);
-            return NoContent();
+            var updatedUser = await _userService.UpdateOneAsync(convertedUserId, updateDto);
+            return Ok(updatedUser);
         }
 
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<bool>> DeleteUser([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteUser([FromRoute] Guid id)
         {
             await _userService.DeleteOneAsync(id);
             return NoContent();
