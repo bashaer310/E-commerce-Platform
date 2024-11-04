@@ -25,11 +25,14 @@ namespace Backend_Teamwork.src.Controllers
             [FromQuery] PaginationOptions paginationOptions
         )
         {
-            var users = await _userService.GetAllAsync(paginationOptions);
-            return Ok(users);
+            var userList = await _userService.GetAllAsync(paginationOptions);
+            var totalCount = await _userService.GetTotalUsersCountAsync();
+            var userResponse = new { UserList = userList, TotalCount = totalCount };
+
+            return Ok(userResponse);
         }
 
-        [HttpGet("artist")]
+        [HttpGet("get-artists")]
         public async Task<ActionResult<List<UserReadDto>>> GetArtists(
             [FromQuery] PaginationOptions paginationOptions
         )
@@ -50,7 +53,7 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(user);
         }
 
-        [HttpGet("profile")]
+        [HttpGet("get-profile")]
         [Authorize]
         public async Task<ActionResult<UserReadDto>> GetInformationById()
         {
@@ -61,7 +64,7 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(user);
         }
 
-        [HttpGet("email/{email:alpha}")]
+        [HttpGet("get-user-by-email/{email:alpha}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserReadDto>> GetByEmail([FromRoute] string email)
         {
@@ -69,7 +72,7 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(user);
         }
 
-        [HttpGet("count")]
+        [HttpGet("count-users")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<int>> GetTotalUsersCount()
         {
@@ -77,7 +80,7 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(count);
         }
 
-        [HttpPost("artist/signup")]
+        [HttpPost("signup-artist")]
         public async Task<ActionResult<UserReadDto>> SignUpArtist(
             [FromBody] UserCreateDto createDto
         )
@@ -86,7 +89,7 @@ namespace Backend_Teamwork.src.Controllers
             return CreatedAtAction(nameof(SignUpArtist), new { id = user.Id }, user);
         }
 
-        [HttpPost("customer/signup")]
+        [HttpPost("signup-customer")]
         public async Task<ActionResult<UserReadDto>> SignUpCustomer(
             [FromBody] UserCreateDto createDto
         )
@@ -121,7 +124,7 @@ namespace Backend_Teamwork.src.Controllers
             return NoContent();
         }
 
-        [HttpPut("profile")]
+        [HttpPut("update-profile")]
         [Authorize]
         public async Task<ActionResult<bool>> UpdateProfileInformation(
             [FromBody] UserUpdateDto updateDto
