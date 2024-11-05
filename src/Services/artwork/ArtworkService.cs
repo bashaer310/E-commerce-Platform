@@ -58,31 +58,28 @@ namespace Backend_Teamwork.src.Services.artwork
             return _mapper.Map<Artwork, ArtworkReadDto>(artwork);
         }
 
-        public async Task<List<ArtworkReadDto>> GetByArtistIdAsync(Guid id)
+        public async Task<List<ArtworkReadDto>> GetByArtistIdAsync(
+            Guid id,
+            PaginationOptions paginationOptions
+        )
         {
-            // check if user exist
-            var user =
-                await _userRepo.GetByIdAsync(id)
-                ?? throw CustomException.NotFound($"User with id: {id} not found");
-            // check the role of user
-            if (user.Role.ToString() != UserRole.Artist.ToString())
+            var artworks = await _artworkRepo.GetByArtistIdAsync(id, paginationOptions);
+            if (artworks == null)
             {
-                throw CustomException.BadRequest($"User with id: {id} is not an Artist");
+                throw CustomException.NotFound($"Artist with id: {id} has no artworks");
             }
-            // check if user(artist) has artwork
-            var artworks =
-                await _artworkRepo.GetByArtistIdAsync(id)
-                ?? throw CustomException.NotFound($"Artist with id: {id} has no artworks");
-            var artworkList = _mapper.Map<List<Artwork>, List<ArtworkReadDto>>(artworks);
-            return artworkList;
+            return _mapper.Map<List<Artwork>, List<ArtworkReadDto>>(artworks);
         }
 
-         // count artworks
         public async Task<int> GetCountAsync()
         {
             return await _artworkRepo.GetCountAsync();
         }
 
+        public async Task<int> GetCountByArtistAsync(Guid id)
+        {
+            return await _artworkRepo.GetCountByArtistAsync(id);
+        }
 
         public async Task<ArtworkReadDto> CreateOneAsync(Guid artistId, ArtworkCreateDto createDto)
         {

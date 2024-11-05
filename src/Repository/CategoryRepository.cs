@@ -40,11 +40,6 @@ namespace Backend_Teamwork.src.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<Category>> SortByNameAsync()
-        {
-            return await _category.OrderBy(c => c.Name).ToListAsync();
-        }
-
         public async Task<Category> CreateAsync(Category category)
         {
             await _category.AddAsync(category);

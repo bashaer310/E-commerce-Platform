@@ -19,10 +19,22 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<WorkshopReadDTO>>> GetWorkshop()
+        public async Task<ActionResult<List<WorkshopReadDTO>>> GetWorkshop() //removed
         {
             var workshops = await _workshopService.GetAllAsync();
             return Ok(workshops);
+        }
+
+        [HttpGet("page")]
+        public async Task<ActionResult<WorkshopReadDTO>> GetWorkshops(
+            [FromQuery] PaginationOptions paginationOptions
+        )
+        {
+            var workshopList = await _workshopService.GetAllAsync(paginationOptions);
+            var totalCount = await _workshopService.GetCountAsync();
+
+            var workshopResponse = new { WorkshopList = workshopList, TotalCount = totalCount };
+            return Ok(workshopResponse);
         }
 
         [HttpGet("{id:guid}")]
@@ -32,13 +44,22 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
             return Ok(workshop);
         }
 
-        [HttpGet("page")]
-        public async Task<ActionResult<WorkshopReadDTO>> GetWorkShopByPage(
+        [HttpGet("get-by-artist")]
+        [Authorize]
+        public async Task<ActionResult<WorkshopReadDTO>> GetWorkshopsByArtistId(
             [FromQuery] PaginationOptions paginationOptions
         )
         {
-            var workshopList = await _workshopService.GetAllAsync(paginationOptions);
-            var totalCount = await _workshopService.GetCountAsync();
+            var authenticateClaims = HttpContext.User;
+            var userId = authenticateClaims
+                .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
+                .Value;
+            var userGuid = new Guid(userId);
+            var workshopList = await _workshopService.GetByArtistIdAsync(
+                userGuid,
+                paginationOptions
+            );
+            var totalCount = await _workshopService.GetCountByArtistAsync(userGuid);
 
             var workshopResponse = new { WorkshopList = workshopList, TotalCount = totalCount };
             return Ok(workshopResponse);

@@ -33,26 +33,12 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(category);
         }
 
-        [HttpGet("search/{name}")]
-        public async Task<ActionResult<CategoryReadDto>> GetCategoryByName([FromRoute] string name)
-        {
-            var category = await _categoryService.GetByNameAsync(name);
-            return Ok(category);
-        }
-
         [HttpGet("page")]
         public async Task<ActionResult<List<CategoryReadDto>>> GetCategoriesWithPagination(
             [FromQuery] PaginationOptions paginationOptions
         )
         {
             var categories = await _categoryService.GetWithPaginationAsync(paginationOptions);
-            return Ok(categories);
-        }
-
-        [HttpGet("sort")]
-        public async Task<ActionResult<List<CategoryReadDto>>> SortCategoriesByName()
-        {
-            var categories = await _categoryService.SortByNameAsync();
             return Ok(categories);
         }
 
@@ -84,7 +70,5 @@ namespace Backend_Teamwork.src.Controllers
             await _categoryService.DeleteAsync(id);
             return NoContent();
         }
-
-
     }
 }

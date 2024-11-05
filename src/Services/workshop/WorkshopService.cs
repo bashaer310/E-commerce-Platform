@@ -69,9 +69,27 @@ namespace Backend_Teamwork.src.Services.workshop
             return _mapper.Map<Workshop, WorkshopReadDTO>(foundworkshop);
         }
 
+        public async Task<List<WorkshopReadDTO>> GetByArtistIdAsync(
+            Guid id,
+            PaginationOptions paginationOptions
+        )
+        {
+            var workshopList = await _workshopRepo.GetByArtistIdAsync(id, paginationOptions);
+            if (workshopList == null)
+            {
+                throw CustomException.NotFound("Workshops not found");
+            }
+            return _mapper.Map<List<Workshop>, List<WorkshopReadDTO>>(workshopList);
+        }
+
         public async Task<int> GetCountAsync()
         {
             return await _workshopRepo.GetCountAsync();
+        }
+
+        public async Task<int> GetCountByArtistAsync(Guid id)
+        {
+            return await _workshopRepo.GetCountByArtistAsync(id);
         }
 
         public async Task DeleteOneAsync(Guid id)

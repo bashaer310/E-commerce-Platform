@@ -115,5 +115,24 @@ namespace Backend_Teamwork.src.Repository
 
             return workshops;
         }
+
+        public async Task<List<Workshop>> GetByArtistIdAsync(
+            Guid id,
+            PaginationOptions paginationOptions
+        )
+        {
+            var workshops = _workshops.Where(w => w.UserId == id).ToList();
+
+            return workshops
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize)
+                .OrderBy(w => w.Name)
+                .ToList();
+        }
+
+        public async Task<int> GetCountByArtistAsync(Guid id)
+        {
+            return _workshops.Where(a => a.UserId == id).ToList().Count();
+        }
     }
 }

@@ -76,14 +76,28 @@ namespace Backend_Teamwork.src.Repository
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<List<Artwork>> GetByArtistIdAsync(Guid id)
+        public async Task<List<Artwork>> GetByArtistIdAsync(
+            Guid id,
+            PaginationOptions paginationOptions
+        )
         {
-            return await _artwork.Include(a => a.Category).Where(a => a.UserId == id).ToListAsync();
+            var artworks = _artwork.Include(a => a.Category).Where(a => a.UserId == id).ToList();
+
+            return artworks
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize)
+                .OrderBy(a => a.Title)
+                .ToList();
         }
 
         public async Task<int> GetCountAsync()
         {
             return await _artwork.CountAsync();
+        }
+
+        public async Task<int> GetCountByArtistAsync(Guid id)
+        {
+            return _artwork.Where(a => a.UserId == id).ToList().Count();
         }
 
         public async Task<Artwork?> CreateOneAsync(Artwork newArtwork)

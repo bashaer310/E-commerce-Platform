@@ -42,17 +42,6 @@ namespace Backend_Teamwork.src.Services.category
             }
             return _mapper.Map<Category, CategoryReadDto>(foundCategory);
         }
-
-        public async Task<CategoryReadDto> GetByNameAsync(string name)
-        {
-            var foundCategory = await _categoryRepository.GetByNameAsync(name);
-            if (foundCategory == null)
-            {
-                throw CustomException.NotFound($"Category with name: {name} not found");
-            }
-            return _mapper.Map<Category, CategoryReadDto>(foundCategory);
-        }
-
         public async Task<List<CategoryReadDto>> GetWithPaginationAsync(
             PaginationOptions paginationOptions
         )
@@ -65,16 +54,6 @@ namespace Backend_Teamwork.src.Services.category
                 throw CustomException.NotFound($"Categories not found");
             }
             return _mapper.Map<List<Category>, List<CategoryReadDto>>(foundCategories);
-        }
-
-        public async Task<List<CategoryReadDto>> SortByNameAsync()
-        {
-            var categories = await _categoryRepository.SortByNameAsync();
-            if (categories.Count == 0)
-            {
-                throw CustomException.NotFound($"Categories not found");
-            }
-            return _mapper.Map<List<Category>, List<CategoryReadDto>>(categories);
         }
 
         public async Task<CategoryReadDto> CreateAsync(CategoryCreateDto category)
@@ -109,15 +88,10 @@ namespace Backend_Teamwork.src.Services.category
         public async Task DeleteAsync(Guid id)
         {
             var foundCategory = await _categoryRepository.GetByIdAsync(id);
-            //var foundArtwork = await _artworkRepository.GetByCategoryIdAsync(foundCategory.Id);
             if (foundCategory == null)
             {
                 throw CustomException.NotFound($"Category with id: {id} not found");
             }
-            /*if (foundArtwork != null)
-            {
-                throw CustomException.NotFound($"Invalid deleting");
-            }*/
             await _categoryRepository.DeleteAsync(foundCategory);
         }
     }
