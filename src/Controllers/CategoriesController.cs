@@ -20,26 +20,22 @@ namespace Backend_Teamwork.src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<CategoryReadDto>>> GetCategories()
+        public async Task<ActionResult<List<CategoryReadDto>>> GetCategories(
+            [FromQuery] PaginationOptions paginationOptions
+        )
         {
-            var categories = await _categoryService.GetAllAsync();
-            return Ok(categories);
+            var categoryList = await _categoryService.GetAllAsync(paginationOptions);
+            var totalCount = await _categoryService.GetCountAsync();
+
+            var categoryResponse = new { CategoryList = categoryList, TotalCount = totalCount };
+            return Ok(categoryResponse);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<CategoryReadDto>> GetCategoryById([FromRoute] Guid id)
         {
             var category = await _categoryService.GetByIdAsync(id);
             return Ok(category);
-        }
-
-        [HttpGet("page")]
-        public async Task<ActionResult<List<CategoryReadDto>>> GetCategoriesWithPagination(
-            [FromQuery] PaginationOptions paginationOptions
-        )
-        {
-            var categories = await _categoryService.GetWithPaginationAsync(paginationOptions);
-            return Ok(categories);
         }
 
         [HttpPost]
@@ -49,10 +45,18 @@ namespace Backend_Teamwork.src.Controllers
         )
         {
             var category = await _categoryService.CreateAsync(categoryDTO);
-            return CreatedAtAction(nameof(CreateCategory), new { id = category.Id }, category);
+            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
 
-        [HttpPut("{id}")]
+        [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteCategory([FromRoute] Guid id)
+        {
+            await _categoryService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryReadDto>> UpdateCategory(
             [FromRoute] Guid id,
@@ -61,14 +65,6 @@ namespace Backend_Teamwork.src.Controllers
         {
             var category = await _categoryService.UpdateAsync(id, categoryDTO);
             return Ok(category);
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> DeleteCategory([FromRoute] Guid id)
-        {
-            await _categoryService.DeleteAsync(id);
-            return NoContent();
         }
     }
 }

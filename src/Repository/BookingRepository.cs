@@ -66,7 +66,7 @@ namespace Backend_Teamwork.src.Repository
 
         public async Task<List<Booking>> GetByWorkshopIdAndStatusAsync(
             Guid workshopId,
-            Status status
+            BookingStatus status
         )
         {
             return await _booking

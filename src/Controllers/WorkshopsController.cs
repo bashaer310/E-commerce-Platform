@@ -19,13 +19,6 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<WorkshopReadDTO>>> GetWorkshop() //removed
-        {
-            var workshops = await _workshopService.GetAllAsync();
-            return Ok(workshops);
-        }
-
-        [HttpGet("page")]
         public async Task<ActionResult<WorkshopReadDTO>> GetWorkshops(
             [FromQuery] PaginationOptions paginationOptions
         )
@@ -77,11 +70,11 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
                 .Value;
             var userGuid = new Guid(userId);
 
-            var workshopCreated = await _workshopService.CreateOneAsync(userGuid, createDto);
+            var workshop = await _workshopService.CreateOneAsync(userGuid, createDto);
             return CreatedAtAction(
-                nameof(CreateWorkshop),
-                new { id = workshopCreated.Id },
-                workshopCreated
+                nameof(GetWorkshopById),
+                new { id = workshop.Id },
+                workshop
             );
         }
 
@@ -100,8 +93,8 @@ namespace sda_3_online_Backend_Teamwork.src.Controllers
             [FromBody] WorkshopUpdateDTO updateDto
         )
         {
-            var updateWorkshop = await _workshopService.UpdateOneAsync(id, updateDto);
-            return Ok(updateWorkshop);
+            var workshop = await _workshopService.UpdateOneAsync(id, updateDto);
+            return Ok(workshop);
         }
     }
 }

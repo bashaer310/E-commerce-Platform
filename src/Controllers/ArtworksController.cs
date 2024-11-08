@@ -39,13 +39,12 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(artwork);
         }
 
-        [HttpGet("get-by-artist")]
+        [HttpGet("artist")]
         [Authorize]
         public async Task<ActionResult<List<ArtworkReadDto>>> GetArtworksByArtistId(
             [FromQuery] PaginationOptions paginationOptions
         )
         {
-            
             var authenticateClaims = HttpContext.User;
             var userId = authenticateClaims
                 .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
@@ -69,19 +68,8 @@ namespace Backend_Teamwork.src.Controllers
                 .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
                 .Value;
             var userGuid = new Guid(userId);
-            var createdArtwork = await _artworkService.CreateOneAsync(userGuid, createDto);
-            return Ok(createdArtwork);
-        }
-
-        [HttpPut("{id:guid}")]
-        [Authorize(Roles = "Admin,Artist")]
-        public async Task<ActionResult> UpdateArtwork(
-            [FromRoute] Guid id,
-            [FromBody] ArtworkUpdateDTO updateDTO
-        )
-        {
-            var artwork = await _artworkService.UpdateOneAsync(id, updateDTO);
-            return Ok(artwork);
+            var artwork = await _artworkService.CreateOneAsync(userGuid, createDto);
+            return CreatedAtAction(nameof(GetArtworkById), new { id = artwork.Id }, artwork);
         }
 
         [HttpDelete("{id:guid}")]
@@ -90,6 +78,17 @@ namespace Backend_Teamwork.src.Controllers
         {
             await _artworkService.DeleteOneAsync(id);
             return NoContent();
+        }
+
+        [HttpPut("{id:guid}")]
+        [Authorize(Roles = "Admin,Artist")]
+        public async Task<ActionResult<ArtworkReadDto>> UpdateArtwork(
+            [FromRoute] Guid id,
+            [FromBody] ArtworkUpdateDTO updateDTO
+        )
+        {
+            var artwork = await _artworkService.UpdateOneAsync(id, updateDTO);
+            return Ok(artwork);
         }
     }
 }

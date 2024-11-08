@@ -19,19 +19,17 @@ namespace Backend_Teamwork.src.Repository
         public async Task<List<User>> GetAllAsync(PaginationOptions paginationOptions)
         {
             //get all
-            var users = _user.ToList();
+            var users = _user.AsQueryable();
 
             //get by name, email, phoneNumber or role
             if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
-                users = users
-                    .Where(u =>
-                        u.Name.ToLower().Contains(paginationOptions.Search.ToLower())
-                        || u.Email.ToLower().Contains(paginationOptions.Search.ToLower())
-                        || u.PhoneNumber.Contains(paginationOptions.Search)
-                        || u.Role.ToString().ToLower().Contains(paginationOptions.Search.ToLower())
-                    )
-                    .ToList();
+                users = users.Where(u =>
+                    u.Name.ToLower().Contains(paginationOptions.Search.ToLower())
+                    || u.Email.ToLower().Contains(paginationOptions.Search.ToLower())
+                    || u.PhoneNumber.Contains(paginationOptions.Search)
+                    || u.Role.ToString().ToLower().Contains(paginationOptions.Search.ToLower())
+                );
             }
 
             //sort by name or email
@@ -39,20 +37,29 @@ namespace Backend_Teamwork.src.Repository
             {
                 users = paginationOptions.SortOrder switch
                 {
-                    "name_desc" => users.OrderByDescending(a => a.Name).ToList(),
-                    "email_desc" => users.OrderByDescending(a => a.Email).ToList(),
-                    "email_asc" => users.OrderBy(a => a.Email).ToList(),
-                    _ => users.OrderBy(a => a.Name).ToList(),
+                    "name_desc" => users.OrderByDescending(a => a.Name),
+                    "email_desc" => users.OrderByDescending(a => a.Email),
+                    "email_asc" => users.OrderBy(a => a.Email),
+                    _ => users.OrderBy(a => a.Name),
                 };
             }
 
             //apply pagination
             users = users
                 .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .ToList();
+                .Take(paginationOptions.PageSize);
 
-            return users;
+            return await users.ToListAsync();
+        }
+
+        public async Task<User?> GetByIdAsync(Guid id)
+        {
+            return await _user.FindAsync(id);
+        }
+
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _user.FirstOrDefaultAsync(c => c.Email == email);
         }
 
         public async Task<int> GetCountAsync()
@@ -67,11 +74,6 @@ namespace Backend_Teamwork.src.Repository
             return user;
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
-        {
-            return await _user.FindAsync(id);
-        }
-
         public async Task DeleteOneAsync(User User)
         {
             _user.Remove(User);
@@ -83,21 +85,6 @@ namespace Backend_Teamwork.src.Repository
             _user.Update(user);
             await _databaseContext.SaveChangesAsync();
             return user;
-        }
-
-        public async Task<User?> GetByEmailAsync(string email)
-        {
-            return await _user.FirstOrDefaultAsync(c => c.Email == email);
-        }
-
-        public async Task<User?> GetByPhoneNumberAsync(string phoneNumber)
-        {
-            return await _user.FirstOrDefaultAsync(c => c.PhoneNumber == phoneNumber);
-        }
-
-        public async Task<User?> GetByNameAsync(string name)
-        {
-            return await _user.FirstOrDefaultAsync(c => c.Name == name);
         }
     }
 }

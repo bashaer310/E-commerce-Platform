@@ -24,7 +24,9 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder(
     builder.Configuration.GetConnectionString("Local")
 );
 dataSourceBuilder.MapEnum<UserRole>();
-dataSourceBuilder.MapEnum<Status>();
+dataSourceBuilder.MapEnum<BookingStatus>();
+dataSourceBuilder.MapEnum<OrderStatus>();
+
 
 //add database connection
 builder.Services.AddDbContext<DatabaseContext>(options =>

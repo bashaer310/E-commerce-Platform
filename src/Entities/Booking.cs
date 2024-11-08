@@ -8,7 +8,7 @@ namespace Backend_Teamwork.src.Entities
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "Status shouldn't be null")]
-        public Status Status { get; set; }
+        public BookingStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } 
 
         [Required(ErrorMessage = "Workshop Id shouldn't be null")]
@@ -21,7 +21,7 @@ namespace Backend_Teamwork.src.Entities
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum Status
+    public enum BookingStatus
     {
         Pending,
         Confirmed,

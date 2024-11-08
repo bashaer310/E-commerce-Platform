@@ -26,20 +26,20 @@ namespace Backend_Teamwork.src.Controllers
         )
         {
             var userList = await _userService.GetAllAsync(paginationOptions);
-            var totalCount = await _userService.GetTotalUsersCountAsync();
+            var totalCount = await _userService.GetCountAsync();
             var userResponse = new { UserList = userList, TotalCount = totalCount };
 
             return Ok(userResponse);
         }
 
-        [HttpGet("get-artists")]
+        [HttpGet("artists")]
         public async Task<ActionResult<List<UserReadDto>>> GetArtists(
             [FromQuery] PaginationOptions paginationOptions
         )
         {
             paginationOptions.Search = UserRole.Artist.ToString();
             var artistList = await _userService.GetAllAsync(paginationOptions);
-            var totalCount = await _userService.GetTotalUsersCountAsync();
+            var totalCount = await _userService.GetCountAsync();
 
             var artistResponse = new { ArtistList = artistList, TotalCount = totalCount };
             return Ok(artistResponse);
@@ -53,9 +53,9 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(user);
         }
 
-        [HttpGet("get-profile")]
+        [HttpGet("profile")]
         [Authorize]
-        public async Task<ActionResult<UserReadDto>> GetInformationById()
+        public async Task<ActionResult<UserReadDto>> GetProfileInformation()
         {
             var authClaims = HttpContext.User;
             var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
@@ -64,46 +64,30 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(user);
         }
 
-        [HttpGet("get-user-by-email/{email:alpha}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<UserReadDto>> GetByEmail([FromRoute] string email)
-        {
-            var user = await _userService.GetByEmailAsync(email);
-            return Ok(user);
-        }
-
-        [HttpGet("count-users")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<int>> GetTotalUsersCount()
-        {
-            var count = await _userService.GetTotalUsersCountAsync();
-            return Ok(count);
-        }
-
-        [HttpPost("signup-artist")]
+        [HttpPost("artist")]
         public async Task<ActionResult<UserReadDto>> SignUpArtist(
             [FromBody] UserCreateDto createDto
         )
         {
             var user = await _userService.CreateOneAsync(createDto, UserRole.Artist);
-            return CreatedAtAction(nameof(SignUpArtist), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
-        [HttpPost("signup-customer")]
+        [HttpPost("customer")]
         public async Task<ActionResult<UserReadDto>> SignUpCustomer(
             [FromBody] UserCreateDto createDto
         )
         {
             var user = await _userService.CreateOneAsync(createDto, UserRole.Customer);
-            return CreatedAtAction(nameof(SignUpCustomer), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
-        [HttpPost("create-admin")]
+        [HttpPost("admin")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserReadDto>> CreateAdmin([FromBody] UserCreateDto createDto)
         {
             var user = await _userService.CreateOneAsync(createDto, UserRole.Admin);
-            return CreatedAtAction(nameof(CreateAdmin), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpPost("signin")]
@@ -113,18 +97,26 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(token);
         }
 
+        [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteUser([FromRoute] Guid id)
+        {
+            await _userService.DeleteOneAsync(id);
+            return NoContent();
+        }
+
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<bool>> UpdateUser(
+        public async Task<ActionResult<UserReadDto>> UpdateUser(
             [FromRoute] Guid id,
             [FromBody] UserUpdateDto updateDto
         )
         {
-            await _userService.UpdateOneAsync(id, updateDto);
-            return NoContent();
+            var user = await _userService.UpdateOneAsync(id, updateDto);
+            return Ok(user);
         }
 
-        [HttpPut("update-profile")]
+        [HttpPut("profile")]
         [Authorize]
         public async Task<ActionResult<UserReadDto>> UpdateProfileInformation(
             [FromBody] UserUpdateDto updateDto
@@ -135,14 +127,6 @@ namespace Backend_Teamwork.src.Controllers
             var convertedUserId = new Guid(userId);
             var updatedUser = await _userService.UpdateOneAsync(convertedUserId, updateDto);
             return Ok(updatedUser);
-        }
-
-        [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> DeleteUser([FromRoute] Guid id)
-        {
-            await _userService.DeleteOneAsync(id);
-            return NoContent();
         }
     }
 }

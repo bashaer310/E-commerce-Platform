@@ -24,58 +24,77 @@ namespace Backend_Teamwork.src.Services.order
             _artworkRepository = artworkRepository;
         }
 
-        //-----------------------------------------------------
-
-        // Retrieves all orders (Only Admin)
-        public async Task<List<OrderReadDto>> GetAllAsync()
+        public async Task<List<OrderReadDto>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            var OrderList = await _orderRepository.GetAllAsync();
-            if (OrderList.Count == 0)
+            // Validate pagination options
+            if (paginationOptions.PageSize <= 0)
             {
-                throw CustomException.NotFound($"Orders not found");
+                throw CustomException.BadRequest("Page Size should be greater than 0.");
+            }
+
+            if (paginationOptions.PageNumber <= 0)
+            {
+                throw CustomException.BadRequest("Page Number should be 0 or greater.");
+            }
+            var OrderList = await _orderRepository.GetAllAsync(paginationOptions);
+            if (OrderList == null)
+            {
+                throw CustomException.NotFound("No orders found");
             }
             return _mapper.Map<List<Order>, List<OrderReadDto>>(OrderList);
         }
 
-        // Retrieves all orders
-        public async Task<List<OrderReadDto>> GetAllAsync(Guid id)
+        public async Task<List<OrderReadDto>> GetAllAsync(
+            PaginationOptions paginationOptions,
+            Guid id
+        )
         {
-            if (id == Guid.Empty)
+            // Validate pagination options
+            if (paginationOptions.PageSize <= 0)
             {
-                throw CustomException.BadRequest("Invalid order ID");
+                throw CustomException.BadRequest("Page Size should be greater than 0.");
             }
-            var orders = await _orderRepository.GetOrdersByUserIdAsync(id);
-            if (orders == null || !orders.Any())
+
+            if (paginationOptions.PageNumber <= 0)
+            {
+                throw CustomException.BadRequest("Page Number should be 0 or greater.");
+            }
+
+            var orders = await _orderRepository.GetByUserAsync(paginationOptions, id);
+            if (orders == null)
             {
                 throw CustomException.NotFound($"No orders found for user with id: {id}");
             }
             return _mapper.Map<List<Order>, List<OrderReadDto>>(orders);
         }
 
-        //-----------------------------------------------------
+        public async Task<OrderReadDto> GetByIdAsync(Guid id)
+        {
+            var foundOrder = await _orderRepository.GetByIdAsync(id);
+            if (foundOrder == null)
+            {
+                throw CustomException.NotFound($"Order with ID {id} not found.");
+            }
+            return _mapper.Map<Order, OrderReadDto>(foundOrder);
+        }
 
-        // Creates a new order
+        public async Task<int> GetCountAsync()
+        {
+            return await _orderRepository.GetCountAsync();
+        }
+
+        public async Task<int> GetCountByCustomerAsync(Guid id)
+        {
+            return await _orderRepository.GetCountByCustomerAsync(id);
+        }
+
         public async Task<OrderReadDto> CreateOneAsync(Guid userId, OrderCreateDto createDto)
         {
-            // Validate the createDto object
-            if (
-                createDto == null
-                || createDto.OrderDetails == null
-                || !createDto.OrderDetails.Any()
-            )
-            {
-                throw CustomException.BadRequest(
-                    "Invalid order data or no artworks provided in the order."
-                );
-            }
+            decimal totalAmount = 0;
 
-            decimal totalAmount = 0; // Initialize total amount
-
-            // Process each artwork in the order
             foreach (var orderDetail in createDto.OrderDetails)
             {
-                // Fetch the artwork by its ID
-                var artwork = await _artworkRepository.GetByIdAsync(orderDetail.ArtworkId); // Using ArtworkId
+                var artwork = await _artworkRepository.GetByIdAsync(orderDetail.ArtworkId);
 
                 // Validate if the artwork exists
                 if (artwork == null)
@@ -106,14 +125,12 @@ namespace Backend_Teamwork.src.Services.order
                 totalAmount += detailAmount;
             }
 
-            // Set the order creation time
-            createDto.CreatedAt = DateTime.UtcNow;
-
             var newOrder = _mapper.Map<OrderCreateDto, Order>(createDto);
 
             // Set the user ID on the new order
             newOrder.UserId = userId;
             newOrder.TotalAmount = totalAmount;
+            newOrder.Status = OrderStatus.Pending;
 
             // Save the order to the repository
             var createdOrder = await _orderRepository.CreateOneAsync(newOrder);
@@ -122,58 +139,17 @@ namespace Backend_Teamwork.src.Services.order
             return _mapper.Map<Order, OrderReadDto>(createdOrder);
         }
 
-        //-----------------------------------------------------
-
-        // Retrieves a order by their ID (Only Admin)
-        public async Task<OrderReadDto> GetByIdAsync(Guid id)
+        public async Task DeleteOneAsync(Guid id)
         {
-            if (id == Guid.Empty)
-            {
-                throw CustomException.BadRequest("Invalid order ID");
-            }
             var foundOrder = await _orderRepository.GetByIdAsync(id);
             if (foundOrder == null)
             {
                 throw CustomException.NotFound($"Order with ID {id} not found.");
             }
-            return _mapper.Map<Order, OrderReadDto>(foundOrder);
+            await _orderRepository.DeleteOneAsync(foundOrder);
         }
 
-        // Retrieves a order by their ID
-        public async Task<OrderReadDto> GetByIdAsync(Guid id, Guid userId)
-        {
-            if (id == Guid.Empty)
-            {
-                throw CustomException.BadRequest("Invalid order ID");
-            }
-            var foundOrder = await _orderRepository.GetByIdAsync(id);
-            if (foundOrder == null)
-            {
-                throw CustomException.NotFound($"Order with ID {id} not found.");
-            }
-            if (foundOrder.UserId != userId)
-            {
-                throw CustomException.Forbidden("You are not authorized to view this order.");
-            }
-
-            return _mapper.Map<Order, OrderReadDto>(foundOrder);
-        }
-
-        //-----------------------------------------------------
-
-        // Deletes a order by their ID
-        public async Task<bool> DeleteOneAsync(Guid id)
-        {
-            var foundOrder = await _orderRepository.GetByIdAsync(id);
-            if (foundOrder == null)
-            {
-                throw CustomException.NotFound($"Order with ID {id} not found.");
-            }
-            return await _orderRepository.DeleteOneAsync(foundOrder);
-        }
-
-        // Updates a order by their ID
-        public async Task<bool> UpdateOneAsync(Guid id, OrderUpdateDto updateDto)
+        public async Task<OrderReadDto> UpdateOneAsync(Guid id, OrderUpdateDto updateDto)
         {
             var foundOrder = await _orderRepository.GetByIdAsync(id);
             if (foundOrder == null)
@@ -181,40 +157,9 @@ namespace Backend_Teamwork.src.Services.order
                 throw CustomException.NotFound($"Order with ID {id} not found.");
             }
 
-            // Map the update DTO to the existing Order entity
             _mapper.Map(updateDto, foundOrder);
-            return await _orderRepository.UpdateOneAsync(foundOrder);
-        }
-
-        public async Task<List<OrderReadDto>> GetOrdersByPage(PaginationOptions paginationOptions)
-        {
-            // Validate pagination options
-            if (paginationOptions.PageSize <= 0)
-            {
-                throw CustomException.BadRequest("Page Size should be greater than 0.");
-            }
-
-            if (paginationOptions.PageNumber < 0)
-            {
-                throw CustomException.BadRequest("Page Number should be 0 or greater.");
-            }
-            var OrderList = await _orderRepository.GetAllAsync(paginationOptions);
-            if (OrderList == null || !OrderList.Any())
-            {
-                throw CustomException.NotFound("Orders not found");
-            }
-            return _mapper.Map<List<Order>, List<OrderReadDto>>(OrderList);
-        }
-
-        public async Task<List<OrderReadDto>> SortOrdersByDate()
-        {
-            var orders = await _orderRepository.GetAllAsync();
-            if (orders.Count == 0)
-            {
-                throw CustomException.NotFound("Orders not found");
-            }
-            var sortedOrders=orders.OrderBy(x => x.CreatedAt).ToList();
-            return _mapper.Map<List<Order>, List<OrderReadDto>>(sortedOrders);
+            var updatedOrder = await _orderRepository.UpdateOneAsync(foundOrder);
+            return _mapper.Map<Order, OrderReadDto>(updatedOrder);
         }
     }
 }

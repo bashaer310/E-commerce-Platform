@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Backend_Teamwork.src.Entities
 {
@@ -15,6 +16,7 @@ namespace Backend_Teamwork.src.Entities
             MaxLength(30, ErrorMessage = "Address shouldn't be more than 30 characters")
         ]
         public string ShippingAddress { get; set; }
+        public OrderStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
 
         [Required(ErrorMessage = "User Id shouldn't be null")]
@@ -23,5 +25,14 @@ namespace Backend_Teamwork.src.Entities
 
         [Required(ErrorMessage = "Order details shouldn't be null")]
         public List<OrderDetails> OrderDetails { get; set; }
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum OrderStatus
+    {
+        Pending,
+        Shipped,
+        Completed,
+        Canceled,
     }
 }

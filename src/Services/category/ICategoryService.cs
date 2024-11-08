@@ -5,11 +5,11 @@ namespace Backend_Teamwork.src.Services.category
 {
     public interface ICategoryService
     {
-        Task<List<CategoryReadDto>> GetAllAsync();
+        Task<List<CategoryReadDto>> GetAllAsync(PaginationOptions paginationOptions);
         Task<CategoryReadDto> GetByIdAsync(Guid id);
-        Task<List<CategoryReadDto>> GetWithPaginationAsync(PaginationOptions paginationOptions);
+        Task<int> GetCountAsync();
         Task<CategoryReadDto> CreateAsync(CategoryCreateDto category);
-        Task<CategoryReadDto> UpdateAsync(Guid id, CategoryUpdateDto category);
         Task DeleteAsync(Guid id);
+        Task<CategoryReadDto> UpdateAsync(Guid id, CategoryUpdateDto category);
     }
 }

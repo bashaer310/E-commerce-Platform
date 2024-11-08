@@ -16,74 +16,37 @@ namespace Backend_Teamwork.src.Repository
             _workshops = databaseContext.Set<Workshop>();
         }
 
-        public async Task<Workshop?> CreateOneAsync(Workshop newWorkshop)
-        {
-            await _workshops.AddAsync(newWorkshop);
-            await _databaseContext.SaveChangesAsync();
-            return await GetByIdAsync(newWorkshop.Id);
-        }
-
-        public async Task<Workshop?> GetByIdAsync(Guid id)
-        {
-            return await _workshops.Include(o => o.User).FirstOrDefaultAsync(o => o.Id == id);
-        }
-
-        public async Task DeleteOneAsync(Workshop deleteWorkshop)
-        {
-            _workshops.Remove(deleteWorkshop);
-            await _databaseContext.SaveChangesAsync();
-        }
-
-        public async Task<Workshop> UpdateOneAsync(Workshop updateWorkshop)
-        {
-            _workshops.Update(updateWorkshop);
-            await _databaseContext.SaveChangesAsync();
-            return await GetByIdAsync(updateWorkshop.Id);
-        }
-
-        public async Task<List<Workshop>> GetAllAsync()
-        {
-            return await _workshops.Include(w => w.User).ToListAsync();
-        }
-
-        public async Task<int> GetCountAsync()
-        {
-            return await _workshops.CountAsync();
-        }
-
         public async Task<List<Workshop>> GetAllAsync(PaginationOptions paginationOptions)
         {
             //get all
-            var workshops = _workshops.Include(w => w.User).ToList();
+            var workshops = _workshops.Include(w => w.User).AsQueryable();
 
             //get by name, location or artist
             if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
-                workshops = workshops
-                    .Where(w =>
-                        w.Name.ToLower().Contains(paginationOptions.Search.ToLower())
-                        || w.Location.ToLower().Contains(paginationOptions.Search.ToLower())
-                        || w.User.Name.ToLower().Contains(paginationOptions.Search.ToLower())
-                    )
-                    .ToList();
+                workshops = workshops.Where(w =>
+                    w.Name.ToLower().Contains(paginationOptions.Search.ToLower())
+                    || w.Location.ToLower().Contains(paginationOptions.Search.ToLower())
+                    || w.User.Name.ToLower().Contains(paginationOptions.Search.ToLower())
+                );
             }
 
             //get by availability
             if (paginationOptions.IsAvailable.HasValue && paginationOptions.IsAvailable == true)
             {
-                workshops = workshops.Where(w => w.Availability == true).ToList();
+                workshops = workshops.Where(w => w.Availability == true);
             }
 
             // get by low price
             if (paginationOptions.LowPrice.HasValue && paginationOptions.LowPrice > 0)
             {
-                workshops = workshops.Where(w => w.Price >= paginationOptions.LowPrice).ToList();
+                workshops = workshops.Where(w => w.Price >= paginationOptions.LowPrice);
             }
 
             // get by high price
             if (paginationOptions.HighPrice.HasValue && paginationOptions.HighPrice > 0)
             {
-                workshops = workshops.Where(w => w.Price <= paginationOptions.HighPrice).ToList();
+                workshops = workshops.Where(w => w.Price <= paginationOptions.HighPrice);
             }
 
             // sort by name, location, price, date or capacity
@@ -91,29 +54,28 @@ namespace Backend_Teamwork.src.Repository
             {
                 workshops = paginationOptions.SortOrder switch
                 {
-                    "name_desc" => workshops.OrderByDescending(w => w.Name).ToList(),
-                    "location_asc" => workshops.OrderBy(w => w.Location).ToList(),
-                    "location_desc" => workshops.OrderByDescending(w => w.Location).ToList(),
-                    "price_desc" => workshops.OrderByDescending(w => w.Price).ToList(),
-                    "price_asc" => workshops.OrderBy(w => w.Price).ToList(),
-                    "start_time_desc" => workshops.OrderByDescending(w => w.StartTime).ToList(),
-                    "start_time_asc" => workshops.OrderBy(w => w.StartTime).ToList(),
-                    "end_time_desc" => workshops.OrderByDescending(w => w.EndTime).ToList(),
-                    "end_time_asc" => workshops.OrderBy(w => w.EndTime).ToList(),
-                    "date_desc" => workshops.OrderByDescending(w => w.CreatedAt).ToList(),
-                    "date_asc" => workshops.OrderBy(w => w.CreatedAt).ToList(),
-                    "capacity_desc" => workshops.OrderByDescending(w => w.Capacity).ToList(),
-                    _ => workshops.OrderBy(a => a.Name).ToList(),
+                    "name_desc" => workshops.OrderByDescending(w => w.Name),
+                    "location_asc" => workshops.OrderBy(w => w.Location),
+                    "location_desc" => workshops.OrderByDescending(w => w.Location),
+                    "price_desc" => workshops.OrderByDescending(w => w.Price),
+                    "price_asc" => workshops.OrderBy(w => w.Price),
+                    "start_time_desc" => workshops.OrderByDescending(w => w.StartTime),
+                    "start_time_asc" => workshops.OrderBy(w => w.StartTime),
+                    "end_time_desc" => workshops.OrderByDescending(w => w.EndTime),
+                    "end_time_asc" => workshops.OrderBy(w => w.EndTime),
+                    "date_desc" => workshops.OrderByDescending(w => w.CreatedAt),
+                    "date_asc" => workshops.OrderBy(w => w.CreatedAt),
+                    "capacity_desc" => workshops.OrderByDescending(w => w.Capacity),
+                    _ => workshops.OrderBy(a => a.Name),
                 };
             }
 
             //apply pagination
             workshops = workshops
                 .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .ToList();
+                .Take(paginationOptions.PageSize);
 
-            return workshops;
+            return await workshops.ToListAsync();
         }
 
         public async Task<List<Workshop>> GetByArtistIdAsync(
@@ -121,18 +83,48 @@ namespace Backend_Teamwork.src.Repository
             PaginationOptions paginationOptions
         )
         {
-            var workshops = _workshops.Where(w => w.UserId == id).ToList();
-
-            return workshops
+            var workshops = _workshops
+                .Where(w => w.UserId == id)
                 .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
                 .Take(paginationOptions.PageSize)
-                .OrderBy(w => w.Name)
-                .ToList();
+                .OrderBy(w => w.Name);
+
+            return await workshops.ToListAsync();
+        }
+
+        public async Task<Workshop?> GetByIdAsync(Guid id)
+        {
+            return await _workshops.Include(o => o.User).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<int> GetCountByArtistAsync(Guid id)
         {
-            return _workshops.Where(a => a.UserId == id).ToList().Count();
+            return await _workshops.CountAsync(a => a.UserId == id);
+        }
+
+        public async Task<int> GetCountAsync()
+        {
+            return await _workshops.CountAsync();
+        }
+
+        public async Task<Workshop?> CreateOneAsync(Workshop workshop)
+        {
+            await _workshops.AddAsync(workshop);
+            await _databaseContext.SaveChangesAsync();
+            return await GetByIdAsync(workshop.Id);
+        }
+
+        public async Task DeleteOneAsync(Workshop workshop)
+        {
+            _workshops.Remove(workshop);
+            await _databaseContext.SaveChangesAsync();
+        }
+
+        public async Task<Workshop?> UpdateOneAsync(Workshop workshop)
+        {
+            _workshops.Update(workshop);
+            await _databaseContext.SaveChangesAsync();
+            return await GetByIdAsync(workshop.Id);
         }
     }
 }

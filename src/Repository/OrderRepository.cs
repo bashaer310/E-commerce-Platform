@@ -16,90 +16,134 @@ namespace Backend_Teamwork.src.Repository
             _order = databaseContext.Set<Order>();
         }
 
-        public async Task<List<Order>> GetAllAsync()
+        public async Task<List<Order>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            // Include User, OrderDetails, Artwork, and Category
-            return await _order
-                .Include(o => o.User) // Include User details
+            //  get all
+            var order = _order
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Artwork) // Include Artwork
-                .ThenInclude(a => a.Category) // Include Category if it's a related entity
-                .ToListAsync();
+                .ThenInclude(od => od.Artwork)
+                .ThenInclude(a => a.Category)
+                .AsQueryable();
+
+            // get by status or address
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
+            {
+                order = _order
+                    .Include(o => o.OrderDetails)
+                    .Include(o => o.User)
+                    .Where(o =>
+                        o.ShippingAddress.Contains(paginationOptions.Search)
+                        || o.Status.ToString().Contains(paginationOptions.Search)
+                    );
+            }
+
+            // sort by amount or date
+            if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
+            {
+                order = paginationOptions.SortOrder switch
+                {
+                    "amount_desc" => order.OrderByDescending(o => o.TotalAmount),
+                    "amount_asc" => order.OrderBy(o => o.TotalAmount),
+                    "date_desc" => order.OrderByDescending(o => o.CreatedAt),
+                    "date_asc" => order.OrderBy(o => o.CreatedAt),
+                    _ => order.OrderBy(o => o.ShippingAddress),
+                };
+            }
+
+            // apply pagination
+            order = order
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize);
+
+            return await order.ToListAsync();
         }
 
-        public async Task<List<Order>> GetOrdersByUserIdAsync(Guid userId)
+        public async Task<List<Order>> GetByUserAsync(
+            PaginationOptions paginationOptions,
+            Guid userId
+        )
         {
-            return await _databaseContext
-                .Order.Include(o => o.User) // Include User
+            //  get all
+            var order = _order
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Artwork) // Include Artwork
-                .ThenInclude(a => a.Category) // Include Category in Artwork
+                .ThenInclude(od => od.Artwork)
+                .ThenInclude(a => a.Category)
                 .Where(order => order.UserId == userId)
-                .ToListAsync();
-        }
+                .AsQueryable();
 
-        public async Task<Order?> CreateOneAsync(Order newOrder)
-        {
-            await _order.AddAsync(newOrder);
-            await _databaseContext.SaveChangesAsync();
-            return await GetByIdAsync(newOrder.Id);
+            // get by status or address
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
+            {
+                order = _order
+                    .Include(o => o.OrderDetails)
+                    .Include(o => o.User)
+                    .Where(o =>
+                        o.ShippingAddress.Contains(paginationOptions.Search)
+                        || o.Status.ToString().Contains(paginationOptions.Search)
+                    );
+            }
+
+            // sort by amount or date
+            if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
+            {
+                order = paginationOptions.SortOrder switch
+                {
+                    "amount_desc" => order.OrderByDescending(o => o.TotalAmount),
+                    "amount_asc" => order.OrderBy(o => o.TotalAmount),
+                    "date_desc" => order.OrderByDescending(o => o.CreatedAt),
+                    "date_asc" => order.OrderBy(o => o.CreatedAt),
+                    _ => order.OrderBy(o => o.ShippingAddress),
+                };
+            }
+
+            // apply pagination
+            order = order
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize);
+
+            return await order.ToListAsync();
         }
 
         public async Task<Order?> GetByIdAsync(Guid id)
         {
             return await _order
-                .Include(o => o.User) // Include User
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Artwork) // Include Artwork
-                .ThenInclude(a => a.Category) // Include Category in Artwork
+                .ThenInclude(od => od.Artwork)
+                .ThenInclude(a => a.Category)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<bool> DeleteOneAsync(Order Order)
+        public async Task<int> GetCountAsync()
         {
-            if (Order == null)
-                return false;
-            _order.Remove(Order);
-            await _databaseContext.SaveChangesAsync();
-            return true;
+            return await _order.CountAsync();
         }
 
-        public async Task<bool> UpdateOneAsync(Order updateOrder)
+        public async Task<int> GetCountByCustomerAsync(Guid id)
         {
-            if (updateOrder == null)
-                return false;
-            _order.Update(updateOrder);
-            await _databaseContext.SaveChangesAsync();
-            return true;
+            return await _order.CountAsync(a => a.UserId == id);
         }
 
-        public async Task<List<Order>> GetAllAsync(PaginationOptions paginationOptions)
+        public async Task<Order?> CreateOneAsync(Order order)
         {
-            // Query for orders with optional search
-            var orderQuery = _order
-                .Include(o => o.OrderDetails) // Include order details
-                .Include(o => o.User) 
-                .Where(o =>
-                    o.ShippingAddress.Contains(paginationOptions.Search)
-                    || o.TotalAmount.ToString().Contains(paginationOptions.Search)
-                );
+            await _order.AddAsync(order);
+            await _databaseContext.SaveChangesAsync();
+            return await GetByIdAsync(order.Id);
+        }
 
-            // Apply pagination
-            orderQuery = orderQuery
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize);
+        public async Task DeleteOneAsync(Order order)
+        {
+            _order.Remove(order);
+            await _databaseContext.SaveChangesAsync();
+        }
 
-            // Sorting logic
-            orderQuery = paginationOptions.SortOrder switch
-            {
-                "amount_desc" => orderQuery.OrderByDescending(o => o.TotalAmount),
-                "amount_asc" => orderQuery.OrderBy(o => o.TotalAmount),
-                "date_desc" => orderQuery.OrderByDescending(o => o.CreatedAt),
-                "date_asc" => orderQuery.OrderBy(o => o.CreatedAt),
-                _ => orderQuery.OrderBy(o => o.ShippingAddress), // Default sorting by ShippingAddress
-            };
-
-            return await orderQuery.ToListAsync();
+        public async Task<Order?> UpdateOneAsync(Order order)
+        {
+            _order.Update(order);
+            await _databaseContext.SaveChangesAsync();
+            return await GetByIdAsync(order.Id);
         }
     }
 }

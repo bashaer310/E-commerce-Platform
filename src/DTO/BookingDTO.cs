@@ -15,7 +15,7 @@ namespace Backend_Teamwork.src.DTO
         public class BookingReadDto
         {
             public Guid Id { get; set; }
-            public Status Status { get; set; }
+            public BookingStatus Status { get; set; }
             public DateTime CreatedAt { get; set; }
             public Workshop Workshop { get; set; }
             public User User { get; set; }

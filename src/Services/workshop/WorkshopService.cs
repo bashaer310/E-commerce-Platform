@@ -17,27 +17,6 @@ namespace Backend_Teamwork.src.Services.workshop
             _mapper = mapper;
         }
 
-        public async Task<WorkshopReadDTO> CreateOneAsync(
-            Guid artistId,
-            WorkshopCreateDTO createworkshopDto
-        )
-        {
-            var workshop = _mapper.Map<WorkshopCreateDTO, Workshop>(createworkshopDto);
-            workshop.UserId = artistId;
-            var workshopCreated = await _workshopRepo.CreateOneAsync(workshop);
-            return _mapper.Map<Workshop, WorkshopReadDTO>(workshopCreated);
-        }
-
-        public async Task<List<WorkshopReadDTO>> GetAllAsync()
-        {
-            var workshopList = await _workshopRepo.GetAllAsync();
-            if (workshopList == null)
-            {
-                throw CustomException.NotFound("Workshops not found");
-            }
-            return _mapper.Map<List<Workshop>, List<WorkshopReadDTO>>(workshopList);
-        }
-
         public async Task<List<WorkshopReadDTO>> GetAllAsync(PaginationOptions paginationOptions)
         {
             // Validate pagination options
@@ -64,7 +43,7 @@ namespace Backend_Teamwork.src.Services.workshop
             var foundworkshop = await _workshopRepo.GetByIdAsync(id);
             if (foundworkshop == null)
             {
-                throw CustomException.NotFound($"Workshop with ID {id} not found.");
+                throw CustomException.NotFound($"Workshop with ID {id} not found");
             }
             return _mapper.Map<Workshop, WorkshopReadDTO>(foundworkshop);
         }
@@ -77,7 +56,7 @@ namespace Backend_Teamwork.src.Services.workshop
             var workshopList = await _workshopRepo.GetByArtistIdAsync(id, paginationOptions);
             if (workshopList == null)
             {
-                throw CustomException.NotFound("Workshops not found");
+                throw CustomException.NotFound("No workshops found");
             }
             return _mapper.Map<List<Workshop>, List<WorkshopReadDTO>>(workshopList);
         }
@@ -92,12 +71,23 @@ namespace Backend_Teamwork.src.Services.workshop
             return await _workshopRepo.GetCountByArtistAsync(id);
         }
 
+        public async Task<WorkshopReadDTO> CreateOneAsync(
+            Guid artistId,
+            WorkshopCreateDTO createworkshopDto
+        )
+        {
+            var workshop = _mapper.Map<WorkshopCreateDTO, Workshop>(createworkshopDto);
+            workshop.UserId = artistId;
+            var workshopCreated = await _workshopRepo.CreateOneAsync(workshop);
+            return _mapper.Map<Workshop, WorkshopReadDTO>(workshopCreated);
+        }
+
         public async Task DeleteOneAsync(Guid id)
         {
             var foundworkshop = await _workshopRepo.GetByIdAsync(id);
             if (foundworkshop == null)
             {
-                throw CustomException.NotFound($"Workshop with ID {id} not found.");
+                throw CustomException.NotFound($"Workshop with ID {id} not found");
             }
             await _workshopRepo.DeleteOneAsync(foundworkshop);
         }
@@ -110,7 +100,7 @@ namespace Backend_Teamwork.src.Services.workshop
             var foundWorkshop = await _workshopRepo.GetByIdAsync(id);
             if (foundWorkshop == null)
             {
-                throw CustomException.NotFound($"Workshop with ID {id} not found.");
+                throw CustomException.NotFound($"Workshop with ID {id} not found");
             }
             _mapper.Map(workshopupdateDto, foundWorkshop);
             var createdWorkshop = await _workshopRepo.UpdateOneAsync(foundWorkshop);

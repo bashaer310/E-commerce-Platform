@@ -23,14 +23,25 @@ namespace Backend_Teamwork.src.Services.category
             _mapper = mapper;
         }
 
-        public async Task<List<CategoryReadDto>> GetAllAsync()
+        public async Task<List<CategoryReadDto>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            var categories = await _categoryRepository.GetAllAsync();
-            if (categories.Count == 0)
+            // Validate pagination options
+            if (paginationOptions.PageSize <= 0)
             {
-                throw CustomException.NotFound($"Categories not found");
+                throw CustomException.BadRequest("PageSize should be greater than 0");
             }
-            return _mapper.Map<List<Category>, List<CategoryReadDto>>(categories);
+
+            if (paginationOptions.PageNumber <= 0)
+            {
+                throw CustomException.BadRequest("PageNumber should be greater than 0");
+            }
+
+            var foundCategories = await _categoryRepository.GetAllAsync(paginationOptions);
+            if (foundCategories == null)
+            {
+                throw CustomException.NotFound($"No categories found");
+            }
+            return _mapper.Map<List<Category>, List<CategoryReadDto>>(foundCategories);
         }
 
         public async Task<CategoryReadDto> GetByIdAsync(Guid id)
@@ -42,18 +53,11 @@ namespace Backend_Teamwork.src.Services.category
             }
             return _mapper.Map<Category, CategoryReadDto>(foundCategory);
         }
-        public async Task<List<CategoryReadDto>> GetWithPaginationAsync(
-            PaginationOptions paginationOptions
-        )
+
+        
+        public async Task<int> GetCountAsync()
         {
-            var foundCategories = await _categoryRepository.GetWithPaginationAsync(
-                paginationOptions
-            );
-            if (foundCategories.Count == 0)
-            {
-                throw CustomException.NotFound($"Categories not found");
-            }
-            return _mapper.Map<List<Category>, List<CategoryReadDto>>(foundCategories);
+            return await _categoryRepository.GetCountAsync();
         }
 
         public async Task<CategoryReadDto> CreateAsync(CategoryCreateDto category)
@@ -66,6 +70,16 @@ namespace Backend_Teamwork.src.Services.category
             var mappedCategory = _mapper.Map<CategoryCreateDto, Category>(category);
             var createdCategory = await _categoryRepository.CreateAsync(mappedCategory);
             return _mapper.Map<Category, CategoryReadDto>(createdCategory);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var foundCategory = await _categoryRepository.GetByIdAsync(id);
+            if (foundCategory == null)
+            {
+                throw CustomException.NotFound($"Category with id: {id} not found");
+            }
+            await _categoryRepository.DeleteAsync(foundCategory);
         }
 
         public async Task<CategoryReadDto> UpdateAsync(Guid id, CategoryUpdateDto category)
@@ -83,16 +97,6 @@ namespace Backend_Teamwork.src.Services.category
             _mapper.Map(category, foundCategory);
             var updatedCategory = await _categoryRepository.UpdateAsync(foundCategory);
             return _mapper.Map<Category, CategoryReadDto>(updatedCategory);
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var foundCategory = await _categoryRepository.GetByIdAsync(id);
-            if (foundCategory == null)
-            {
-                throw CustomException.NotFound($"Category with id: {id} not found");
-            }
-            await _categoryRepository.DeleteAsync(foundCategory);
         }
     }
 }

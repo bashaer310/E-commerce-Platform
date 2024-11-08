@@ -16,9 +16,25 @@ namespace Backend_Teamwork.src.Repository
             _category = databaseContext.Set<Category>();
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<List<Category>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            return await _category.ToListAsync();
+            //get all
+            var categories = _category.AsQueryable();
+
+            //get by name
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
+            {
+                categories = categories.Where(c =>
+                    c.Name.ToLower().Contains(paginationOptions.Search.ToLower())
+                );
+            }
+
+            categories = _category
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize)
+                .OrderBy(c => c.Name);
+
+            return await categories.ToListAsync();
         }
 
         public async Task<Category?> GetByIdAsync(Guid id)
@@ -31,13 +47,9 @@ namespace Backend_Teamwork.src.Repository
             return await _category.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
         }
 
-        public async Task<List<Category>> GetWithPaginationAsync(PaginationOptions paginationOptions)
+        public async Task<int> GetCountAsync()
         {
-            return await _category
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .OrderBy(c => c.Name)
-                .ToListAsync();
+            return await _category.CountAsync();
         }
 
         public async Task<Category> CreateAsync(Category category)
@@ -47,17 +59,17 @@ namespace Backend_Teamwork.src.Repository
             return category;
         }
 
+        public async Task DeleteAsync(Category category)
+        {
+            _category.Remove(category);
+            await _databaseContext.SaveChangesAsync();
+        }
+
         public async Task<Category> UpdateAsync(Category category)
         {
             _category.Update(category);
             await _databaseContext.SaveChangesAsync();
             return category;
-        }
-
-        public async Task DeleteAsync(Category category)
-        {
-            _category.Remove(category);
-            await _databaseContext.SaveChangesAsync();
         }
     }
 }

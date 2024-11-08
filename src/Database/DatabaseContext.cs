@@ -21,7 +21,9 @@ namespace Backend_Teamwork.src.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<UserRole>();
-            modelBuilder.HasPostgresEnum<Status>();
+            modelBuilder.HasPostgresEnum<BookingStatus>();
+            modelBuilder.HasPostgresEnum<OrderStatus>();
+
 
             modelBuilder.Entity<User>().HasIndex(x => x.PhoneNumber).IsUnique();
             modelBuilder.Entity<User>().HasIndex(x => x.Email).IsUnique();
@@ -32,11 +34,11 @@ namespace Backend_Teamwork.src.Database
                     new User
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Abeer",
-                        PhoneNumber = "0563034770",
-                        Email = "abeer@gmail.com",
+                        Name = "Admin",
+                        PhoneNumber = "+966563034770",
+                        Email = "admin@artify.com",
                         Password = PasswordUtils.HashPassword(
-                            "123",
+                            "12345678",
                             out string hashedPassword,
                             out byte[] salt
                         ),

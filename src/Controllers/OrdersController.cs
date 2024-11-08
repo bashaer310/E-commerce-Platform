@@ -19,54 +19,46 @@ namespace Backend_Teamwork.src.Controllers
             _orderService = service;
         }
 
-        // GET: api/v1/orders
         [HttpGet]
-        [Authorize(Roles = "Admin")] // Accessible by Admin
-        public async Task<ActionResult<List<OrderReadDto>>> GetOrders()
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<OrderReadDto>>> GetOrders(
+            [FromQuery] PaginationOptions paginationOptions
+        )
         {
-            var orders = await _orderService.GetAllAsync();
-            return Ok(orders);
+            var orderList = await _orderService.GetAllAsync(paginationOptions);
+            var totalCount = await _orderService.GetCountAsync();
+            var orderResponse = new { OrderList = orderList, TotalCount = totalCount };
+            return Ok(orderResponse);
         }
 
-        // GET: api/v1/orders
         [HttpGet("my-orders")]
         [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<List<OrderReadDto>>> GetMyOrders()
+        public async Task<ActionResult<List<OrderReadDto>>> GetMyOrders(
+            PaginationOptions paginationOptions
+        )
         {
             var authClaims = HttpContext.User;
             var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             var convertedUserId = new Guid(userId);
-            var orders = await _orderService.GetAllAsync(convertedUserId);
-            return Ok(orders);
+
+            var orderList = await _orderService.GetAllAsync(paginationOptions, convertedUserId);
+            var totalCount = await _orderService.GetCountAsync();
+            var orderResponse = new { OrderList = orderList, TotalCount = totalCount };
+            return Ok(orderResponse);
         }
 
-        // GET: api/v1/orders/{id}
-        [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")] // Accessible by Admin
+        [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<ActionResult<OrderReadDto>> GetOrderById([FromRoute] Guid id)
         {
             var order = await _orderService.GetByIdAsync(id);
             return Ok(order);
         }
 
-        // GET: api/v1/orders/{id}
-        [HttpGet("my-orders/{id}")]
-        [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<OrderReadDto>> GetMyOrderById([FromRoute] Guid id)
-        {
-            var authClaims = HttpContext.User;
-            var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-            var convertedUserId = new Guid(userId);
-            var order = await _orderService.GetByIdAsync(id, convertedUserId);
-            return Ok(order);
-        }
-
-        // POST: api/v1/orders
-        [HttpPost("add")]
+        [HttpPost]
         [Authorize(Roles = "Customer")]
         public async Task<ActionResult<OrderReadDto>> AddOrder([FromBody] OrderCreateDto createDto)
         {
-            // extract user information
             var authenticateClaims = HttpContext.User;
             var userId = authenticateClaims
                 .FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!
@@ -82,45 +74,23 @@ namespace Backend_Teamwork.src.Controllers
             );
         }
 
-        // PUT: api/v1/orders/{id}
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] // Accessible by Admin
-        public async Task<ActionResult<bool>> UpdateOrder(
+        [HttpPut("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<OrderReadDto>> UpdateOrder(
             [FromRoute] Guid id,
             [FromBody] OrderUpdateDto updateDto
         )
         {
-            var isUpdated = await _orderService.UpdateOneAsync(id, updateDto);
-            return Ok(isUpdated);
+            var updatedOrder = await _orderService.UpdateOneAsync(id, updateDto);
+            return Ok(updatedOrder);
         }
 
-        // DELETE: api/v1/orders/{id}
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Accessible by Admin
-        public async Task<ActionResult<bool>> DeleteOrder(Guid id)
+        [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteOrder(Guid id)
         {
             await _orderService.DeleteOneAsync(id);
             return NoContent();
-        }
-
-        // Extra Features
-        // GET: api/v1/users/page
-        [HttpGet("pagination")]
-        [Authorize(Roles = "Admin")] // Accessible by Admin
-        public async Task<ActionResult<List<OrderReadDto>>> GetOrdersByPage(
-            [FromQuery] PaginationOptions paginationOptions
-        )
-        {
-            var orders = await _orderService.GetOrdersByPage(paginationOptions);
-            return Ok(orders);
-        }
-
-        [HttpGet("sort-by-date")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<OrderReadDto>>> SortOrdersByDate()
-        {
-            var orders = await _orderService.SortOrdersByDate();
-            return Ok(orders);
         }
     }
 }

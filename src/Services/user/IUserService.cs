@@ -8,11 +8,9 @@ namespace Backend_Teamwork.src.Services.user
     {
         Task<List<UserReadDto>> GetAllAsync(PaginationOptions paginationOptions);
         Task<UserReadDto> GetByIdAsync(Guid id);
-        Task<UserReadDto> GetByEmailAsync(string email);
-        Task<UserReadDto> GetByPhoneNumberAsync(string phoneNumber);
-        Task<int> GetTotalUsersCountAsync();
-        Task<UserReadDto> CreateOneAsync(UserCreateDto createDto, UserRole userRole);
+        Task<int> GetCountAsync();
         Task<string> SignInAsync(UserSigninDto createDto);
+        Task<UserReadDto> CreateOneAsync(UserCreateDto createDto, UserRole userRole);
         Task DeleteOneAsync(Guid id);
         Task<UserReadDto> UpdateOneAsync(Guid id, UserUpdateDto updateDto);
     }

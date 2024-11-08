@@ -133,7 +133,7 @@ namespace Backend_Teamwork.src.Services.booking
                 throw CustomException.BadRequest($"Invalid booking");
             }
             //4. check if the user enrolled in other workshop at the same time
-            var workshops = await _workshopRepository.GetAllAsync();
+            var workshops = await _workshopRepository.GetAllAsync(new PaginationOptions());
             var foundWorkshop = workshops.FirstOrDefault(w =>
                 (w.StartTime == workshop.StartTime && w.EndTime == workshop.EndTime)
                 || (w.StartTime < workshop.StartTime && w.EndTime > workshop.StartTime)
@@ -154,7 +154,7 @@ namespace Backend_Teamwork.src.Services.booking
             //create booking
             var mappedBooking = _mapper.Map<BookingCreateDto, Booking>(booking);
             mappedBooking.UserId = userId;
-            mappedBooking.Status = Status.Pending;
+            mappedBooking.Status = BookingStatus.Pending;
             var createdBooking = await _bookingRepository.CreateAsync(mappedBooking);
             return _mapper.Map<Booking, BookingReadDto>(createdBooking);
         }
@@ -173,7 +173,7 @@ namespace Backend_Teamwork.src.Services.booking
                 throw CustomException.BadRequest($"Invalid confirming");
             }
             //2. check if the booking status isn't pending
-            if (booking.Status.ToString() != Status.Pending.ToString())
+            if (booking.Status.ToString() != BookingStatus.Pending.ToString())
             {
                 throw CustomException.BadRequest($"Invalid confirming");
             }
@@ -181,7 +181,7 @@ namespace Backend_Teamwork.src.Services.booking
             //var payment =
 
             //confirm booking
-            booking.Status = Status.Confirmed;
+            booking.Status = BookingStatus.Confirmed;
             var updatedBooking = await _bookingRepository.UpdateAsync(booking);
             return _mapper.Map<Booking, BookingReadDto>(updatedBooking);
         }
@@ -202,7 +202,7 @@ namespace Backend_Teamwork.src.Services.booking
             }
             var bookings = await _bookingRepository.GetByWorkshopIdAndStatusAsync(
                 workshopId,
-                Status.Pending
+                BookingStatus.Pending
             );
             //3. check if there is booking with Pending Status
             if (bookings == null)
@@ -212,7 +212,7 @@ namespace Backend_Teamwork.src.Services.booking
             foreach (var booking in bookings)
             {
                 //reject booking
-                booking.Status = Status.Rejected;
+                booking.Status = BookingStatus.Rejected;
                 var updatedBooking = await _bookingRepository.UpdateAsync(booking);
             }
             return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
@@ -236,7 +236,7 @@ namespace Backend_Teamwork.src.Services.booking
                 throw CustomException.BadRequest($"Invalid canceling");
             }
             //3. check if the booking status isn't pending
-            if (booking.Status.ToString() != Status.Pending.ToString())
+            if (booking.Status.ToString() != BookingStatus.Pending.ToString())
             {
                 throw CustomException.BadRequest($"Invalid canceling");
             }
@@ -244,7 +244,7 @@ namespace Backend_Teamwork.src.Services.booking
             //var payment =
 
             //Cancel booking
-            booking.Status = Status.Canceled;
+            booking.Status = BookingStatus.Canceled;
             var updatedBooking = await _bookingRepository.UpdateAsync(booking);
             return _mapper.Map<Booking, BookingReadDto>(updatedBooking);
         }
