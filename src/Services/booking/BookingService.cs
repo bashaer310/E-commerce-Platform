@@ -25,12 +25,27 @@ namespace Backend_Teamwork.src.Services.booking
             _mapper = mapper;
         }
 
-        public async Task<List<BookingReadDto>> GetAllAsync()
+        public async Task<List<BookingReadDto>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            var bookings = await _bookingRepository.GetAllAsync();
+            var bookings = await _bookingRepository.GetAllAsync(paginationOptions);
             if (bookings.Count == 0)
             {
                 throw CustomException.NotFound($"Bookings not found");
+            }
+            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
+        }
+
+        public async Task<List<BookingReadDto>> GetAllByUserIdAsync(
+            PaginationOptions paginationOptions,
+            Guid userId
+        )
+        {
+            var bookings = await _bookingRepository.GetByUserIdAsync(userId, paginationOptions);
+            if (bookings.Count == 0)
+            {
+                throw CustomException.NotFound(
+                    $"Bookings associated with userId: {userId} not found"
+                );
             }
             return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
         }
@@ -49,70 +64,19 @@ namespace Backend_Teamwork.src.Services.booking
             return _mapper.Map<Booking, BookingReadDto>(booking);
         }
 
-        public async Task<List<BookingReadDto>> GetByUserIdAsync(Guid userId)
+        public async Task<int> GetCountAsync()
         {
-            var bookings = await _bookingRepository.GetByUserIdAsync(userId);
-            if (bookings.Count == 0)
-            {
-                throw CustomException.NotFound(
-                    $"Bookings associated with userId: {userId} not found"
-                );
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
+            return await _bookingRepository.GetCountAsync();
         }
 
-        public async Task<List<BookingReadDto>> GetByStatusAsync(string status)
+        public async Task<int> GetCountByUserIdAsync(Guid id)
         {
-            var bookings = await _bookingRepository.GetByStatusAsync(status);
-            if (bookings.Count == 0)
-            {
-                throw CustomException.NotFound($"Bookings with status: {status} not found");
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
-        }
-
-        public async Task<List<BookingReadDto>> GetByUserIdAndStatusAsync(
-            Guid userId,
-            string status
-        )
-        {
-            var bookings = await _bookingRepository.GetByUserIdAndStatusAsync(userId, status);
-            if (bookings.Count == 0)
-            {
-                throw CustomException.NotFound($"Bookings with status: {status} not found");
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
-        }
-
-        public async Task<List<BookingReadDto>> GetWithPaginationAsync(
-            PaginationOptions paginationOptions
-        )
-        {
-            var bookings = await _bookingRepository.GetWithPaginationAsync(paginationOptions);
-            if (bookings.Count == 0)
-            {
-                throw CustomException.NotFound($"Bookings not found");
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
-        }
-
-        public async Task<List<BookingReadDto>> GetByUserIdWithPaginationAsync(
-            PaginationOptions paginationOptions
-        )
-        {
-            var bookings = await _bookingRepository.GetByUserIdWithPaginationAsync(
-                paginationOptions
-            );
-            if (bookings.Count == 0)
-            {
-                throw CustomException.NotFound($"Bookings not found");
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
+            return await _bookingRepository.GetCountByUserIdAsync(id);
         }
 
         public async Task<BookingReadDto> CreateAsync(BookingCreateDto booking, Guid userId)
         {
-            //1. check if the workshop is found
+            //1. check if the workshop is existed
             var workshop = await _workshopRepository.GetByIdAsync(booking.WorkshopId);
             if (workshop == null)
             {
@@ -154,13 +118,12 @@ namespace Backend_Teamwork.src.Services.booking
             //create booking
             var mappedBooking = _mapper.Map<BookingCreateDto, Booking>(booking);
             mappedBooking.UserId = userId;
-            mappedBooking.Status = BookingStatus.Pending;
+            mappedBooking.Status = BookingStatus.InProgress;
             var createdBooking = await _bookingRepository.CreateAsync(mappedBooking);
             return _mapper.Map<Booking, BookingReadDto>(createdBooking);
         }
 
-        //after payment
-        public async Task<BookingReadDto> ConfirmAsync(Guid id)
+        public async Task<BookingReadDto> UpdateStatusToConfirmedAsync(Guid id)
         {
             var booking = await _bookingRepository.GetByIdAsync(id);
             if (booking == null)
@@ -170,15 +133,13 @@ namespace Backend_Teamwork.src.Services.booking
             //1. check if the workshop isn't available
             if (!booking.Workshop.Availability)
             {
-                throw CustomException.BadRequest($"Invalid confirming");
+                throw CustomException.BadRequest($"Invalid updating Status");
             }
             //2. check if the booking status isn't pending
-            if (booking.Status.ToString() != BookingStatus.Pending.ToString())
+            if (booking.Status.ToString() != BookingStatus.InProgress.ToString())
             {
-                throw CustomException.BadRequest($"Invalid confirming");
+                throw CustomException.BadRequest($"Invalid updating Status");
             }
-            //3. check if the user doesn't pay
-            //var payment =
 
             //confirm booking
             booking.Status = BookingStatus.Confirmed;
@@ -186,39 +147,7 @@ namespace Backend_Teamwork.src.Services.booking
             return _mapper.Map<Booking, BookingReadDto>(updatedBooking);
         }
 
-        //after workshop becomes unavailable
-        public async Task<List<BookingReadDto>> RejectAsync(Guid workshopId)
-        {
-            var workshop = await _workshopRepository.GetByIdAsync(workshopId);
-            //1. check if the workshop is found
-            if (workshop == null)
-            {
-                throw CustomException.NotFound($"Workshp with id: {workshopId} not found");
-            }
-            //2. check if the workshop is available
-            if (workshop.Availability)
-            {
-                throw CustomException.BadRequest($"Invalid regecting");
-            }
-            var bookings = await _bookingRepository.GetByWorkshopIdAndStatusAsync(
-                workshopId,
-                BookingStatus.Pending
-            );
-            //3. check if there is booking with Pending Status
-            if (bookings == null)
-            {
-                throw CustomException.BadRequest($"Invalid regecting");
-            }
-            foreach (var booking in bookings)
-            {
-                //reject booking
-                booking.Status = BookingStatus.Rejected;
-                var updatedBooking = await _bookingRepository.UpdateAsync(booking);
-            }
-            return _mapper.Map<List<Booking>, List<BookingReadDto>>(bookings);
-        }
-
-        public async Task<BookingReadDto> CancelAsync(Guid id, Guid userId)
+        public async Task<BookingReadDto> UpdateStatusToCanceledAsync(Guid id, Guid userId)
         {
             var booking = await _bookingRepository.GetByIdAsync(id);
             if (booking == null)
@@ -228,21 +157,18 @@ namespace Backend_Teamwork.src.Services.booking
             //1. check if the booking belongs to the user
             if (booking.UserId != userId)
             {
-                throw CustomException.BadRequest($"Invalid canceling");
+                throw CustomException.BadRequest($"Invalid updating Status");
             }
             //2. check if the workshop is available
             if (!booking.Workshop.Availability)
             {
-                throw CustomException.BadRequest($"Invalid canceling");
+                throw CustomException.BadRequest($"Invalid updating Status");
             }
-            //3. check if the booking status isn't pending
-            if (booking.Status.ToString() != BookingStatus.Pending.ToString())
+            //3. check if the booking status isn't InProgress
+            if (booking.Status.ToString() != BookingStatus.InProgress.ToString())
             {
-                throw CustomException.BadRequest($"Invalid canceling");
+                throw CustomException.BadRequest($"Invalid updating Status");
             }
-            //4. check if the user pay
-            //var payment =
-
             //Cancel booking
             booking.Status = BookingStatus.Canceled;
             var updatedBooking = await _bookingRepository.UpdateAsync(booking);

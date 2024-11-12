@@ -23,9 +23,8 @@ namespace Backend_Teamwork.src.Entities
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum BookingStatus
     {
-        Pending,
+        InProgress,
         Confirmed,
         Canceled,
-        Rejected,
     }
 }

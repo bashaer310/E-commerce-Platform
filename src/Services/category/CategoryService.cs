@@ -54,7 +54,6 @@ namespace Backend_Teamwork.src.Services.category
             return _mapper.Map<Category, CategoryReadDto>(foundCategory);
         }
 
-        
         public async Task<int> GetCountAsync()
         {
             return await _categoryRepository.GetCountAsync();

@@ -30,9 +30,9 @@ namespace Backend_Teamwork.src.Entities
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum OrderStatus
     {
-        Pending,
+        InProgress,
         Shipped,
-        Completed,
+        Delivered,
         Canceled,
     }
 }

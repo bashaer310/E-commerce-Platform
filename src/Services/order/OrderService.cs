@@ -44,7 +44,7 @@ namespace Backend_Teamwork.src.Services.order
             return _mapper.Map<List<Order>, List<OrderReadDto>>(OrderList);
         }
 
-        public async Task<List<OrderReadDto>> GetAllAsync(
+        public async Task<List<OrderReadDto>> GetAllByUserIdAsync(
             PaginationOptions paginationOptions,
             Guid id
         )
@@ -83,9 +83,9 @@ namespace Backend_Teamwork.src.Services.order
             return await _orderRepository.GetCountAsync();
         }
 
-        public async Task<int> GetCountByCustomerAsync(Guid id)
+        public async Task<int> GetCountByUserIdAsync(Guid id)
         {
-            return await _orderRepository.GetCountByCustomerAsync(id);
+            return await _orderRepository.GetCountByUserIdAsync(id);
         }
 
         public async Task<OrderReadDto> CreateOneAsync(Guid userId, OrderCreateDto createDto)
@@ -130,7 +130,7 @@ namespace Backend_Teamwork.src.Services.order
             // Set the user ID on the new order
             newOrder.UserId = userId;
             newOrder.TotalAmount = totalAmount;
-            newOrder.Status = OrderStatus.Pending;
+            newOrder.Status = OrderStatus.InProgress;
 
             // Save the order to the repository
             var createdOrder = await _orderRepository.CreateOneAsync(newOrder);
@@ -139,17 +139,40 @@ namespace Backend_Teamwork.src.Services.order
             return _mapper.Map<Order, OrderReadDto>(createdOrder);
         }
 
-        public async Task DeleteOneAsync(Guid id)
+        public async Task<OrderReadDto> UpdateStatusToShippedAsync(Guid id)
         {
             var foundOrder = await _orderRepository.GetByIdAsync(id);
             if (foundOrder == null)
             {
                 throw CustomException.NotFound($"Order with ID {id} not found.");
             }
-            await _orderRepository.DeleteOneAsync(foundOrder);
+            if (foundOrder.Status.ToString() != OrderStatus.InProgress.ToString())
+            {
+                throw CustomException.BadRequest($"Invalid updating Status");
+            }
+            foundOrder.Status = OrderStatus.Shipped;
+            var updatedOrder = await _orderRepository.UpdateOneAsync(foundOrder);
+            return _mapper.Map<Order, OrderReadDto>(updatedOrder);
         }
 
-        public async Task<OrderReadDto> UpdateOneAsync(Guid id, OrderUpdateDto updateDto)
+        public async Task<OrderReadDto> UpdateStatusToDeliveredAsync(Guid id)
+        {
+            var foundOrder = await _orderRepository.GetByIdAsync(id);
+            if (foundOrder == null)
+            {
+                throw CustomException.NotFound($"Order with ID {id} not found.");
+            }
+            if (foundOrder.Status.ToString() != OrderStatus.Shipped.ToString())
+            {
+                throw CustomException.BadRequest($"Invalid updating Status");
+            }
+
+            foundOrder.Status = OrderStatus.Delivered;
+            var updatedOrder = await _orderRepository.UpdateOneAsync(foundOrder);
+            return _mapper.Map<Order, OrderReadDto>(updatedOrder);
+        }
+
+        public async Task<OrderReadDto> UpdateStatusToCanceledAsync(Guid id)
         {
             var foundOrder = await _orderRepository.GetByIdAsync(id);
             if (foundOrder == null)
@@ -157,7 +180,12 @@ namespace Backend_Teamwork.src.Services.order
                 throw CustomException.NotFound($"Order with ID {id} not found.");
             }
 
-            _mapper.Map(updateDto, foundOrder);
+            if (foundOrder.Status.ToString() != OrderStatus.InProgress.ToString())
+            {
+                throw CustomException.BadRequest($"Invalid updating Status");
+            }
+
+            foundOrder.Status = OrderStatus.Canceled;
             var updatedOrder = await _orderRepository.UpdateOneAsync(foundOrder);
             return _mapper.Map<Order, OrderReadDto>(updatedOrder);
         }

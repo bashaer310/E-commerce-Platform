@@ -16,13 +16,79 @@ namespace Backend_Teamwork.src.Repository
             _booking = databaseContext.Set<Booking>();
         }
 
-        public async Task<List<Booking>> GetAllAsync()
+        public async Task<List<Booking>> GetAllAsync(PaginationOptions paginationOptions)
         {
-            return await _booking
+            //  get all
+            var booking = _booking
                 .Include(b => b.User)
                 .Include(b => b.Workshop)
                 .ThenInclude(w => w.User)
-                .ToListAsync();
+                .AsQueryable();
+
+            // get by status
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
+            {
+                booking = booking.Where(b =>
+                    b.Status.ToString().ToLower().Contains(paginationOptions.Search)
+                );
+            }
+
+            // sort by amount or date
+            if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
+            {
+                booking = paginationOptions.SortOrder switch
+                {
+                    "date_desc" => booking.OrderByDescending(b => b.CreatedAt),
+                    _ => booking.OrderBy(b => b.CreatedAt)
+                };
+            }
+
+            
+            // apply pagination
+            booking = booking
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize);
+
+            return await booking.ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetByUserIdAsync(
+            Guid userId,
+            PaginationOptions paginationOptions
+        )
+        {
+            //  get all
+            var booking = _booking.Where(b=>b.UserId == userId)
+                .Include(b => b.User)
+                .Include(b => b.Workshop)
+                .ThenInclude(w => w.User)
+                .AsQueryable();
+
+            // get by status
+            if (!string.IsNullOrEmpty(paginationOptions.Search))
+            {
+                booking = booking.Where(b =>
+                    b.Status.ToString().ToLower().Contains(paginationOptions.Search)
+                );
+            }
+
+            // sort by amount or date
+            if (!string.IsNullOrEmpty(paginationOptions.SortOrder))
+            {
+                booking = paginationOptions.SortOrder switch
+                {
+                    "date_desc" => booking.OrderByDescending(b => b.CreatedAt),
+                    _ => booking.OrderBy(b => b.CreatedAt)
+                };
+            }
+
+            
+            // apply pagination
+            booking = booking
+                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
+                .Take(paginationOptions.PageSize);
+
+            return await booking.ToListAsync();
         }
 
         public async Task<Booking?> GetByIdAsync(Guid id)
@@ -34,74 +100,20 @@ namespace Backend_Teamwork.src.Repository
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<List<Booking>> GetByUserIdAsync(Guid userId)
-        {
-            return await _booking
-                .Include(b => b.User)
-                .Include(b => b.Workshop)
-                .ThenInclude(w => w.User)
-                .Where(b => b.UserId == userId)
-                .ToListAsync();
-        }
-
-        public async Task<List<Booking>> GetByStatusAsync(string status)
-        {
-            return await _booking
-                .Include(b => b.User)
-                .Include(b => b.Workshop)
-                .ThenInclude(w => w.User)
-                .Where(b => b.Status.ToString().ToLower() == status.ToLower())
-                .ToListAsync();
-        }
-
-        public async Task<List<Booking>> GetByUserIdAndStatusAsync(Guid userId, string status)
-        {
-            return await _booking
-                .Include(b => b.User)
-                .Include(b => b.Workshop)
-                .ThenInclude(w => w.User)
-                .Where(b => b.Status.ToString() == status.ToString() && b.UserId == userId)
-                .ToListAsync();
-        }
-
-        public async Task<List<Booking>> GetByWorkshopIdAndStatusAsync(
-            Guid workshopId,
-            BookingStatus status
-        )
-        {
-            return await _booking
-                .Where(b => b.WorkshopId == workshopId && b.Status == status)
-                .ToListAsync();
-        }
-
         public async Task<bool> GetByUserIdAndWorkshopIdAsync(Guid userId, Guid workshopId)
         {
             return await _booking.AnyAsync(b => b.UserId == userId && b.WorkshopId == workshopId);
         }
 
-        public async Task<List<Booking>> GetWithPaginationAsync(PaginationOptions paginationOptions)
+        
+        public async Task<int> GetCountAsync()
         {
-            return await _booking
-                .Include(b => b.User)
-                .Include(b => b.Workshop)
-                .ThenInclude(w => w.User)
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .ToListAsync();
+            return await _booking.CountAsync();
         }
 
-        public async Task<List<Booking>> GetByUserIdWithPaginationAsync(
-            PaginationOptions paginationOptions
-        )
+        public async Task<int> GetCountByUserIdAsync(Guid id)
         {
-            var bookings = _booking.Where(b => b.UserId.ToString() == paginationOptions.Search);
-            return await bookings
-                .Include(b => b.User)
-                .Include(b => b.Workshop)
-                .ThenInclude(w => w.User)
-                .Skip((paginationOptions.PageNumber - 1) * paginationOptions.PageSize)
-                .Take(paginationOptions.PageSize)
-                .ToListAsync();
+            return await _booking.CountAsync(b => b.UserId == id);
         }
 
         public async Task<Booking?> CreateAsync(Booking booking)

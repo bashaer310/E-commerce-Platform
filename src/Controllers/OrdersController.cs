@@ -31,9 +31,9 @@ namespace Backend_Teamwork.src.Controllers
             return Ok(orderResponse);
         }
 
-        [HttpGet("my-orders")]
+        [HttpGet("customer")]
         [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<List<OrderReadDto>>> GetMyOrders(
+        public async Task<ActionResult<List<OrderReadDto>>> GetAllOrdersByUserId(
             PaginationOptions paginationOptions
         )
         {
@@ -41,7 +41,10 @@ namespace Backend_Teamwork.src.Controllers
             var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             var convertedUserId = new Guid(userId);
 
-            var orderList = await _orderService.GetAllAsync(paginationOptions, convertedUserId);
+            var orderList = await _orderService.GetAllByUserIdAsync(
+                paginationOptions,
+                convertedUserId
+            );
             var totalCount = await _orderService.GetCountAsync();
             var orderResponse = new { OrderList = orderList, TotalCount = totalCount };
             return Ok(orderResponse);
@@ -57,7 +60,9 @@ namespace Backend_Teamwork.src.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<OrderReadDto>> AddOrder([FromBody] OrderCreateDto createDto)
+        public async Task<ActionResult<OrderReadDto>> CreateOrder(
+            [FromBody] OrderCreateDto createDto
+        )
         {
             var authenticateClaims = HttpContext.User;
             var userId = authenticateClaims
@@ -74,23 +79,34 @@ namespace Backend_Teamwork.src.Controllers
             );
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("shipping/{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<OrderReadDto>> UpdateOrder(
-            [FromRoute] Guid id,
-            [FromBody] OrderUpdateDto updateDto
+        public async Task<ActionResult<OrderReadDto>> UpdateOrderStatusToShipped(
+            [FromRoute] Guid id
         )
         {
-            var updatedOrder = await _orderService.UpdateOneAsync(id, updateDto);
+            var updatedOrder = await _orderService.UpdateStatusToShippedAsync(id);
             return Ok(updatedOrder);
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpPut("delivering/{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> DeleteOrder(Guid id)
+        public async Task<ActionResult<OrderReadDto>> UpdateOrderStatusToDelivered(
+            [FromRoute] Guid id
+        )
         {
-            await _orderService.DeleteOneAsync(id);
-            return NoContent();
+            var updatedOrder = await _orderService.UpdateStatusToDeliveredAsync(id);
+            return Ok(updatedOrder);
+        }
+
+        [HttpPut("canceling/{id:guid}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<OrderReadDto>> UpdateOrderStatusToCanceled(
+            [FromRoute] Guid id
+        )
+        {
+            var updatedOrder = await _orderService.UpdateStatusToCanceledAsync(id);
+            return Ok(updatedOrder);
         }
     }
 }

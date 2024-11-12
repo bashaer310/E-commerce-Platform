@@ -29,12 +29,10 @@ namespace Backend_Teamwork.src.Repository
             // get by status or address
             if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
-                order = _order
-                    .Include(o => o.OrderDetails)
-                    .Include(o => o.User)
+                order = order
                     .Where(o =>
-                        o.ShippingAddress.Contains(paginationOptions.Search)
-                        || o.Status.ToString().Contains(paginationOptions.Search)
+                        o.ShippingAddress.ToLower().Contains(paginationOptions.Search)
+                        || o.Status.ToString().ToLower().Contains(paginationOptions.Search)
                     );
             }
 
@@ -76,12 +74,12 @@ namespace Backend_Teamwork.src.Repository
             // get by status or address
             if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
-                order = _order
+                order = order
                     .Include(o => o.OrderDetails)
                     .Include(o => o.User)
                     .Where(o =>
-                        o.ShippingAddress.Contains(paginationOptions.Search)
-                        || o.Status.ToString().Contains(paginationOptions.Search)
+                        o.ShippingAddress.ToLower().Contains(paginationOptions.Search)
+                        || o.Status.ToString().ToLower().Contains(paginationOptions.Search)
                     );
             }
 
@@ -121,7 +119,7 @@ namespace Backend_Teamwork.src.Repository
             return await _order.CountAsync();
         }
 
-        public async Task<int> GetCountByCustomerAsync(Guid id)
+        public async Task<int> GetCountByUserIdAsync(Guid id)
         {
             return await _order.CountAsync(a => a.UserId == id);
         }
@@ -131,12 +129,6 @@ namespace Backend_Teamwork.src.Repository
             await _order.AddAsync(order);
             await _databaseContext.SaveChangesAsync();
             return await GetByIdAsync(order.Id);
-        }
-
-        public async Task DeleteOneAsync(Order order)
-        {
-            _order.Remove(order);
-            await _databaseContext.SaveChangesAsync();
         }
 
         public async Task<Order?> UpdateOneAsync(Order order)

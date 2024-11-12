@@ -26,13 +26,36 @@ namespace Backend_Teamwork.src.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookings()
+        public async Task<ActionResult<List<BookingReadDto>>> GetBookings(
+            [FromQuery] PaginationOptions paginationOptions
+        )
         {
-            var bookings = await _bookingService.GetAllAsync();
-            return Ok(bookings);
+            var bookingList = await _bookingService.GetAllAsync(paginationOptions);
+            var totalCount = await _bookingService.GetCountAsync();
+            var bookingResponse = new { BookingList = bookingList, TotalCount = totalCount };
+            return Ok(bookingResponse);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("customer")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<List<BookingReadDto>>> GetAllBookingsByUserId(
+            [FromQuery] PaginationOptions paginationOptions
+        )
+        {
+            var authClaims = HttpContext.User;
+            var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+            var userGuid = new Guid(userId);
+
+            var bookingList = await _bookingService.GetAllByUserIdAsync(
+                paginationOptions,
+                userGuid
+            );
+            var totalCount = await _bookingService.GetCountByUserIdAsync(userGuid);
+            var bookingResponse = new { BookingList = bookingList, TotalCount = totalCount };
+            return Ok(bookingResponse);
+        }
+
+        [HttpGet("{id:guid}")]
         [Authorize(Roles = "Admin,Customer")]
         public async Task<ActionResult<BookingReadDto>> GetBookingById([FromRoute] Guid id)
         {
@@ -42,73 +65,6 @@ namespace Backend_Teamwork.src.Controllers
             var convertedUserId = new Guid(userId);
             var booking = await _bookingService.GetByIdAsync(id, convertedUserId, userRole);
             return Ok(booking);
-        }
-
-        [HttpGet("search/{userId:guid}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsByUserId(
-            [FromRoute] Guid userId
-        )
-        {
-            var bookings = await _bookingService.GetByUserIdAsync(userId);
-            return Ok(bookings);
-        }
-
-        [HttpGet("my-bookings")]
-        [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsByUserId()
-        {
-            var authClaims = HttpContext.User;
-            var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-            var convertedUserId = new Guid(userId);
-            var bookings = await _bookingService.GetByUserIdAsync(convertedUserId);
-            return Ok(bookings);
-        }
-
-        [HttpGet("search/{status:alpha}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsByStatus(
-            [FromRoute] string status
-        )
-        {
-            var bookings = await _bookingService.GetByStatusAsync(status);
-            return Ok(bookings);
-        }
-
-        [HttpGet("my-bookings/search/{status}")]
-        [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsByUserIdAndStatus(
-            [FromRoute] string status
-        )
-        {
-            var authClaims = HttpContext.User;
-            var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-            var convertedUserId = new Guid(userId);
-            var bookings = await _bookingService.GetByUserIdAndStatusAsync(convertedUserId, status);
-            return Ok(bookings);
-        }
-
-        [HttpGet("page")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsWithPagination(
-            [FromQuery] PaginationOptions paginationOptions
-        )
-        {
-            var bookings = await _bookingService.GetWithPaginationAsync(paginationOptions);
-            return Ok(bookings);
-        }
-
-        [HttpGet("my-bookings/page")]
-        [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<List<BookingReadDto>>> GetBookingsByUserIdWithPagination(
-            [FromQuery] PaginationOptions paginationOptions
-        )
-        {
-            var authClaims = HttpContext.User;
-            var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
-            paginationOptions.Search=userId;
-            var bookings = await _bookingService.GetByUserIdWithPaginationAsync(paginationOptions);
-            return Ok(bookings);
         }
 
         [HttpPost]
@@ -124,32 +80,26 @@ namespace Backend_Teamwork.src.Controllers
             return CreatedAtAction(nameof(CreateBooking), new { id = booking.Id }, booking);
         }
 
-        [HttpPut("confirm/{id}")]
+        [HttpPut("confirming/{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BookingReadDto>> ConfirmBooking([FromRoute] Guid id)
+        public async Task<ActionResult<BookingReadDto>> UpdateBookingStatusToConfirmed(
+            [FromRoute] Guid id
+        )
         {
-            var booking = await _bookingService.ConfirmAsync(id);
+            var booking = await _bookingService.UpdateStatusToConfirmedAsync(id);
             return Ok(booking);
         }
 
-        [HttpPut("reject/{workshopId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<BookingReadDto>>> RejectBooking(
-            [FromRoute] Guid workshopId
-        )
-        {
-            var bookings = await _bookingService.RejectAsync(workshopId);
-            return Ok(bookings);
-        }
-
-        [HttpPut("my-bookings/cancel/{id}")]
+        [HttpPut("canceling/{id:guid}")]
         [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<BookingReadDto>> CancelBooking([FromRoute] Guid id)
+        public async Task<ActionResult<BookingReadDto>> UpdateBookingStatusToCanceled(
+            [FromRoute] Guid id
+        )
         {
             var authClaims = HttpContext.User;
             var userId = authClaims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             var convertedUserId = new Guid(userId);
-            var booking = await _bookingService.CancelAsync(id, convertedUserId);
+            var booking = await _bookingService.UpdateStatusToCanceledAsync(id, convertedUserId);
             return Ok(booking);
         }
     }
