@@ -34,7 +34,7 @@ namespace Backend_Teamwork.src.Controllers
         [HttpGet("customer")]
         [Authorize(Roles = "Customer")]
         public async Task<ActionResult<List<OrderReadDto>>> GetAllOrdersByUserId(
-            PaginationOptions paginationOptions
+          [FromQuery]   PaginationOptions paginationOptions
         )
         {
             var authClaims = HttpContext.User;
