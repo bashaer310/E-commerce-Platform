@@ -45,7 +45,7 @@ namespace Backend_Teamwork.src.Controllers
                 paginationOptions,
                 convertedUserId
             );
-            var totalCount = await _orderService.GetCountAsync();
+            var totalCount = await _orderService.GetCountByUserIdAsync(convertedUserId);
             var orderResponse = new { OrderList = orderList, TotalCount = totalCount };
             return Ok(orderResponse);
         }

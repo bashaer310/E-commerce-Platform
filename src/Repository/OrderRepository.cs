@@ -75,8 +75,6 @@ namespace Backend_Teamwork.src.Repository
             if (!string.IsNullOrEmpty(paginationOptions.Search))
             {
                 order = order
-                    .Include(o => o.OrderDetails)
-                    .Include(o => o.User)
                     .Where(o =>
                         o.ShippingAddress.ToLower().Contains(paginationOptions.Search)
                         || o.Status.ToString().ToLower().Contains(paginationOptions.Search)
