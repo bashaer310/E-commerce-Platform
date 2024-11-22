@@ -185,6 +185,25 @@ namespace Backend_Teamwork.src.Services.order
                 throw CustomException.BadRequest($"Invalid updating Status");
             }
 
+            foreach (var orderDetail in foundOrder.OrderDetails)
+            {
+                var artwork = await _artworkRepository.GetByIdAsync(orderDetail.ArtworkId);
+
+                // Validate if the artwork exists
+                if (artwork == null)
+                {
+                    throw CustomException.NotFound(
+                        $"Artwork with ID: {orderDetail.ArtworkId} not found."
+                    );
+                }
+
+                // Increase artwork stock
+                artwork.Quantity += orderDetail.Quantity;
+
+                // Update the artwork quantity in the repository
+                await _artworkRepository.UpdateOneAsync(artwork);
+            }
+
             foundOrder.Status = OrderStatus.Canceled;
             var updatedOrder = await _orderRepository.UpdateOneAsync(foundOrder);
             return _mapper.Map<Order, OrderReadDto>(updatedOrder);
