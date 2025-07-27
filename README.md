@@ -32,8 +32,6 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET 8,
 - **PostgreSQl**: Relational database for storing data
 - **JWT**: For user authentication and authorization
 - **AutoMapper**: For object mapping
-- **Swagger**: API documentation
-
 
 ## Getting Started
 
