@@ -87,7 +87,7 @@ e-commerce-platform/
 ```
 
 ## API Endpoints
-All the API Endpoints are documented can be accessed at postman:
+All the API Endpoints are documented and can be accessed at:
 
 ## Deployment
 
