@@ -40,7 +40,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET 8,
 ### 1. Clone the repository:
 
 ```bash
-git clone https://github.com/AbeerAljohanii/sda-3-online-Backend_Teamwork
+git clone https://github.com/bashaer310/E-commerce-Platform
 ```
 
 ### 2. Setup database
@@ -70,25 +70,22 @@ dotnet ef database update
 dotnet watch
 ```
 
-The API will be available at: `http://localhost:5125`
-
-### Swagger
-
-- Navigate to `http://localhost:5125/swagger/index.html` to explore the API endpoints.
-
 ## Project structure
 
 ```bash
-|-- Controllers: API controllers with request and response
-|-- Database # DbContext and Database Configurations
-|-- DTOs # Data Transfer Objects
-|-- Entities # Database Entities (User, ArtWorks, Category, Order)
-|-- Middleware # Logging request, response and Error Handler
-|-- Repositories # Repository Layer for database operations
-|-- Services # Business Logic Layer
-|-- Utils # Common logics
-|-- Migrations # Entity Framework Migrations
-|-- Program.cs # Application Entry Point
+e-commerce-platform/
+├── Src/
+│   ├── Controllers/        # API controllers for handling requests and responses
+│   ├── Database/           # DbContext and database configurations
+│   ├── DTOs/               # Data Transfer Objects
+│   ├── Entities/           # Database entities
+│   ├── Middleware/         # Request/response logging and error handling
+│   ├── Repositories/       # Repository layer for database operations
+│   ├── Services/           # Business logic layer
+│   ├── Utils/              # Utility functions and common logic
+│   ├── Migrations/         # Entity Framework Core migrations
+│   └── Program.cs          # Application entry point
+├── appsettings.json        # Configuration file for environment variables and DB connection
 ```
 
 ## API Endpoints
