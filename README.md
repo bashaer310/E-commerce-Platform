@@ -26,7 +26,6 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET 8,
   - Create new booking for workshops
   - Retrieve booking listing and booking details with handling pagination and filtering
   - Update booking status (confirmed, canceled)
-  - 
 ## Technologies Used
 - **.Net 8**: Web API Framework
 - **Entity Framework Core**: ORM for database interactions
