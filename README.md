@@ -47,7 +47,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   E-commerce-Platform
   ```
 
-3. Configure Database
+3. Configure Database:
 - Ensure PostgreSQL is running.
 - Create `appsettings.json` file in the root folder.
 - Add your connection string:
@@ -60,14 +60,14 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 }
 ```
 
-4. Apply migrations
+4. Apply migrations:
 
 ```bash
 dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-- Run the application
+- Run the application:
 
 ```bash
 dotnet watch
