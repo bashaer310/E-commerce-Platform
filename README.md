@@ -25,14 +25,13 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - Admin can update booking status (confirmed, canceled)
  
 ## Technologies Used
-
-  - .NET 8 – Backend framework
-  - ASP.NET Core Web API – RESTful API development
+  - C# – Programming language
+  - .NET 8 – RESTful API framework
   - Entity Framework Core – ORM for database access
   - PostgreSQL – Relational database
   - Npgsql – PostgreSQL provider for EF Core
   - JWT – Token-based authentication
-   -AutoMapper – DTO and entity mapping
+  -AutoMapper – DTO and entity mapping
   - Swagger / OpenAPI – API documentation
   - Postman – API testing tool
 
