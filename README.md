@@ -26,14 +26,14 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
  
 ## Technologies Used
   - C# – Programming language
-  - .NET 8 – RESTful API framework
+  - ASP.NET 8 – RESTful API framework
   - Entity Framework Core – ORM for database access
   - PostgreSQL – Relational database
   - Npgsql – PostgreSQL provider for EF Core
   - JWT – Token-based authentication
-  -AutoMapper – DTO and entity mapping
+  - AutoMapper – DTO and entity mapping
   - Swagger / OpenAPI – API documentation
-  - Postman – API testing tool
+  - Postman – API testing
 
 ## Getting Started
 
