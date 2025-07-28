@@ -1,6 +1,6 @@
 # E-commerce Platform
 
-This is a backend solution for an e-commerce platform, built with C#, ASP.NET 8, and PostgreSQL. The platform allows artists to showcase their artwork, while customers can purchase artworks and book art workshops. It includes core features like **user authentication**, **product management (artworks, workshops)**, **category management (types of artwork)**, and **order and booking processing**.
+This is a backend solution for an e-commerce platform, built with C#, ASP.NET, and PostgreSQL. The platform allows artists to showcase their artwork, while customers can purchase artworks and book art workshops. It includes core features like **user authentication**, **product management (artworks, workshops)**, **category management (types of artwork)**, and **order and booking processing**.
 
 ## Features
 
@@ -27,11 +27,11 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET 8,
   - Retrieve booking listing and booking details with handling pagination and filtering
   - Update booking status (confirmed, canceled)
 ## Technologies Used
-- **.Net 8**: Web API Framework
-- **Entity Framework Core**: ORM for database interactions
-- **PostgreSQl**: Relational database for storing data
-- **JWT**: For user authentication and authorization
-- **AutoMapper**: For object mapping
+- .Net 8
+- Entity Framework Core
+- PostgreSQl
+- JWT
+- AutoMapper
 
 ## Getting Started
 
@@ -71,7 +71,7 @@ dotnet watch
 ## Project structure
 
 ```bash
-e-commerce-platform/
+E-commerce-platform/
 ├── Src/
 │   ├── Controllers/        # API controllers for handling requests and responses
 │   ├── Database/           # DbContext and database configurations
