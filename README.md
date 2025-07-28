@@ -6,32 +6,33 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 
 - **User Management**:
   - Register new User (Customer/Artist/Admin)
-  - User authentication and authorization 
+  - User authentication and role-based authorization 
   - Update user profile
 - **Product Management (Artworks, Workshops)**:
-  - Create new product (title, description, price)
-  - Retrieve product listing and product details with handling pagination and filtering
-  - Update product information
-  - Delete product
+  - Artists can create, update, delete products (title, description, price)
+  - Customers can retrieve products with handling pagination and filtering
+  - View product details 
 - **Category Management**:
-  - Create new category (types of artwork)
-  - Retrieve category listing and category details with handling pagination and filtering
-  - Update category information
-  - Delete category
+  - Admin can create, update, delete categories (types of artwork)
+  - Retrieve categories with handling pagination and filtering
 - **Order Management**:
-  - Create new order for purchased artworks
-  - Retrieve order listing and order details with handling pagination and filtering
-  - Update order status (pending, shipped, completed)
+  - Customers can create new order for artworks
+  - Customers can retrieve order history with pagination and filtering
+  - Admin can update order status (pending, shipped, completed)
 - **Booking Management**:
-  - Create new booking for workshops
-  - Retrieve booking listing and booking details with handling pagination and filtering
-  - Update booking status (confirmed, canceled)
+  -  Customers can create new booking for workshops
+  -  Customers can retrieve booking history with pagination and filtering
+  - Admin can update booking status (confirmed, canceled)
 ## Technologies Used
-- .Net 8
-- Entity Framework Core
-- PostgreSQl
-- JWT
-- AutoMapper
+  - .NET 8 – Backend framework
+  - ASP.NET Core Web API – RESTful API development
+  - Entity Framework Core – ORM for database access
+  - PostgreSQL – Relational database
+  - Npgsql – PostgreSQL provider for EF Core
+  - JWT – Token-based authentication
+   -AutoMapper – DTO and entity mapping
+  - Swagger / OpenAPI – API documentation
+  - Postman – API testing tool
 
 ## Getting Started
 
