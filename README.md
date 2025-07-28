@@ -37,17 +37,20 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 
 ## Getting Started
 
-### 1. Clone the repository:
+1. Clone the repository:
+  ```bash
+  git clone https://github.com/bashaer310/E-commerce-Platform
+  ```
 
-```bash
-git clone https://github.com/bashaer310/E-commerce-Platform
-```
+2. Navigate to the project folder:
+  ```bash
+  E-commerce-Platform
+  ```
 
-### 2. Setup database
-
-- Make sure PostgreSQL Server is running
-- Create `appsettings.json` file
-- Update the connection string in `appsettings.json`
+3. Configure Database
+- Ensure PostgreSQL is running.
+- Create `appsettings.json` file in the root folder.
+- Add your connection string:
 
 ```json
 {
@@ -57,7 +60,7 @@ git clone https://github.com/bashaer310/E-commerce-Platform
 }
 ```
 
-- Run migrations to create database
+4. Apply migrations
 
 ```bash
 dotnet ef migrations add InitialCreate
@@ -69,6 +72,8 @@ dotnet ef database update
 ```bash
 dotnet watch
 ```
+5. Testing the API
+Use tools like Postman to test your API endpoints.
 
 ## Project structure
 
