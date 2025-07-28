@@ -10,11 +10,11 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - Update user profile
 - **Product Management (Artworks, Workshops)**:
   - Artists can create, update, delete products (title, description, price)
-  - Customers can retrieve products with handling pagination and filtering
+  - Customers can retrieve products with pagination and filtering
   - View product details 
-- **Category Management**:
-  - Admin can create, update, delete categories (types of artwork)
-  - Retrieve categories with handling pagination and filtering
+- **Category Management (types of artwork)**:
+  - Admin can create, update, delete categories
+  - Retrieve categories with pagination and filtering
 - **Order Management**:
   - Customers can create new order for artworks
   - Customers can retrieve order history with pagination and filtering
@@ -23,7 +23,9 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   -  Customers can create new booking for workshops
   -  Customers can retrieve booking history with pagination and filtering
   - Admin can update booking status (confirmed, canceled)
+ 
 ## Technologies Used
+
   - .NET 8 – Backend framework
   - ASP.NET Core Web API – RESTful API development
   - Entity Framework Core – ORM for database access
