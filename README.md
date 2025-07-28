@@ -98,8 +98,7 @@ E-commerce-platform/
 All the API Endpoints are documented and can be accessed at:
 
 ## Deployment
-
-The application is deployed and can be accessed at: [E-commerce-Platform](https://artify-backend.onrender.com/)
+The application is deployed and can be accessed at: [E-commerce-Platform](https://artify-backend-project.onrender.com/)
 
 ## Team Members
 
