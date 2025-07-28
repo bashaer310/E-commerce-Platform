@@ -72,9 +72,9 @@ dotnet ef database update
 ```bash
 dotnet watch
 ```
-5. Testing the API
+5. Test the API
    
- Use tools like Postman to test your API endpoints.
+   Use tools like Postman to test the endpoints.
 
 ## Project structure
 
