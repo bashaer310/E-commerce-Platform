@@ -14,7 +14,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - **Product Details View** - users can view product details 
 - **Category Management (types of artwork)**:
   - **Category Management** - admin can create, update, delete categories
-  - **Category Retrieval** - retrieve categories with pagination and filtering
+  - **Category Retrieval** - users can retrieve categories with pagination and filtering
 - **Order Management**:
   - **Order Creation** - customers can create new order for artworks
   - **Order History** - customers can retrieve order history with pagination and filtering
