@@ -5,24 +5,24 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 ## Features
 
 - **User Management**:
-  - Register new User (Customer/Artist)
-  - User authentication and role-based authorization 
-  - Update user profile
+  - **User Registration** - users can sign up (Customer/Artist)
+  - **Authentication & Authorization** - users can login with role-based access
+  - **Profile Management** users can update their prodile
 - **Product Management (Artworks, Workshops)**:
-  - Artists can create, update, delete products (title, description, price)
-  - Customers can retrieve products with pagination and filtering
-  - View product details 
+  - **Product Management** - artists can create, update, delete products (title, description, price)
+  - **Product Browsing** - customers can retrieve products with pagination and filtering
+  - **Product Details View** users can view product details 
 - **Category Management (types of artwork)**:
-  - Admin can create, update, delete categories
-  - Retrieve categories with pagination and filtering
+  - **Category Management** - admin can create, update, delete categories
+  - **Category Retrieval** - retrieve categories with pagination and filtering
 - **Order Management**:
-  - Customers can create new order for artworks
-  - Customers can retrieve order history with pagination and filtering
-  - Admin can update order status (pending, shipped, completed)
+  - **Order Creation** - customers can create new order for artworks
+  - **Order History** - customers can retrieve order history with pagination and filtering
+  - **Order Status Management** - admin can update order status (pending, shipped, completed)
 - **Booking Management**:
-  -  Customers can create new booking for workshops
-  -  Customers can retrieve booking history with pagination and filtering
-  - Admin can update booking status (confirmed, canceled)
+  - **Booking Creation** - customers can create new booking for workshops
+  - **Order History** - customers can retrieve booking history with pagination and filtering
+  - **Order Status Management** - admin can update booking status (confirmed, canceled)
  
 ## Technologies Used
 - Languages
