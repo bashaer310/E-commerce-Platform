@@ -7,11 +7,11 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 - **User Management**:
   - **User Registration** - users can sign up (Customer/Artist)
   - **Authentication & Authorization** - users can login with role-based access
-  - **Profile Management** users can update their prodile
+  - **Profile Management** - users can update their prodile
 - **Product Management (Artworks, Workshops)**:
   - **Product Management** - artists can create, update, delete products (title, description, price)
   - **Product Browsing** - customers can retrieve products with pagination and filtering
-  - **Product Details View** users can view product details 
+  - **Product Details View** - users can view product details 
 - **Category Management (types of artwork)**:
   - **Category Management** - admin can create, update, delete categories
   - **Category Retrieval** - retrieve categories with pagination and filtering
@@ -21,8 +21,8 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - **Order Status Management** - admin can update order status (pending, shipped, completed)
 - **Booking Management**:
   - **Booking Creation** - customers can create new booking for workshops
-  - **Order History** - customers can retrieve booking history with pagination and filtering
-  - **Order Status Management** - admin can update booking status (confirmed, canceled)
+  - **Booking History** - customers can retrieve booking history with pagination and filtering
+  - **Booking Status Management** - admin can update booking status (confirmed, canceled)
  
 ## Technologies Used
 - Languages
