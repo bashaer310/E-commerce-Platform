@@ -1,6 +1,6 @@
 # E-commerce Platform
 
-This is a backend solution for an e-commerce platform, built with C#, ASP.NET, and PostgreSQL. The platform allows artists to showcase their artwork, while customers can purchase artworks and book art workshops. It includes core features like **user authentication**, **product management (artworks, workshops)**, **category management (types of artwork)**, and **order and booking processing**.
+This is a backend solution for an e-commerce platform, built with C#, ASP.NET, and PostgreSQL. The platform allows artists to showcase their work, while customers can purchase artworks and book art workshops. It includes core features like **user authentication**, **product management (artworks, workshops)**, **category management (types of artwork)**, and **order and booking processing**.
 
 ## Features
 
