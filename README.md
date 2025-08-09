@@ -5,7 +5,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 ## Features
 
 - **User Management**:
-  - **User Registration** - users can create account (Customer/Artist)
+  - **User Registration** - users can create an account (Customer/Artist)
   - **Authentication & Authorization** - users can login with role-based access
   - **Profile Management** - users can update their profile
  
