@@ -5,7 +5,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 ## Features
 
 - **User Management**:
-  - **User Registration** - users can create an account (Customer/Artist)
+  - **User Registration** - users can create an account (customer/artist)
   - **Authentication & Authorization** - users can login with role-based access
   - **Profile Management** - users can update their profile
  
@@ -31,15 +31,19 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 ## Technologies Used
 - Languages
   - C# – Programming language
+    
 - Frameworks
   - ASP.NET 8 – RESTful API framework
+    
 - Datebase
   - PostgreSQL – Relational database
+    
 - Packages
   - Entity Framework Core – ORM for database access
   - Npgsql – PostgreSQL provider for EF Core
   - JWT – Token-based authentication
   - AutoMapper – DTO and entity mapping
+    
 - Tools
   - Swagger / OpenAPI – API documentation
   - Postman – API testing
