@@ -9,7 +9,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - **Authentication & Authorization** - users can login with role-based access
   - **Profile Management** - users can update their profile
  
-- **Product Management (Artworks, Workshops)**:
+- **Product Management (artworks, workshops)**:
   - **Product Management** - artists can create, update, and delete products (title, description, price)
   - **Product Browsing** - customers can retrieve products with pagination and filtering
   - **Product Details** - customers can view product details
