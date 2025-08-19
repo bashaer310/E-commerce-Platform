@@ -87,7 +87,7 @@ dotnet ef database update
 dotnet watch
 ```
 6. Test the API
-   - your apis are available at [locahost/ ](http://localhost:5125)
+   - your apis are available at: [locahost:5125](http://localhost:5125)
    - Use tools like Postman to test the endpoints.
 
 
