@@ -62,13 +62,14 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 
 3. Configure Database:
 - Ensure PostgreSQL is running.
+- Create database in PostgreSQL. 
 - Create `appsettings.json` file in the root folder.
 - Add your connection string:
 
 ```json
 {
   "ConnectionStrings": {
-    "Local": "Server=localhost;Database=ECommerceDb;User Id=your_username;Password=your_password;"
+    "Local": "Server=localhost;Database=db_name;User Id=your_username;Password=your_password;"
   }
 }
 ```
@@ -80,14 +81,15 @@ dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-- Run the application:
+5. Run the application:
 
 ```bash
 dotnet watch
 ```
-5. Test the API
-   
-   Use tools like Postman to test the endpoints.
+6. Test the API
+   - your apis are available at [locahost/ ](http://localhost:5125)
+   - Use tools like Postman to test the endpoints.
+
 
 ## Project structure
 
