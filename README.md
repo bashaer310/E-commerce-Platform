@@ -96,17 +96,18 @@ dotnet watch
 ```bash
 E-commerce-platform/
 ├── Src/
-│   ├── Controllers/        # API controllers for handling requests and responses
+│   ├── Controllers/        # Handles API requests and responses
 │   ├── Database/           # DbContext and database configurations
-│   ├── DTOs/               # Data Transfer Objects
-│   ├── Entities/           # Database entities
+│   ├── DTOs/               # Data Transfer Objects (request/response models)
+│   ├── Entities/           # Database entities (tables mapping)
 │   ├── Middleware/         # Request/response logging and error handling
-│   ├── Repositories/       # Repository layer for database operations
+│   ├── Repositories/       # Data access layer
 │   ├── Services/           # Business logic layer
-│   ├── Utils/              # Utility functions and common logic
+│   ├── Utils/              # Utility functions and shared helpers
 │   ├── Migrations/         # Entity Framework Core migrations
 │   └── Program.cs          # Application entry point
-├── appsettings.json        # Configuration file for environment variables and DB connection
+├── appsettings.json        # Configuration file (DB connection, environment variables)
+├── Backend.csproj          # Project file and dependencies
 ```
 
 ## API Endpoints
