@@ -96,7 +96,7 @@ dotnet watch
 ```bash
 E-commerce-platform/
 ├── Src/
-│   ├── Controllers/        # Handles API requests and responses
+│   ├── Controllers/        # API for handling requests and responses
 │   ├── Database/           # DbContext and database configurations
 │   ├── DTOs/               # Data Transfer Objects (request/response models)
 │   ├── Entities/           # Database entities (tables mapping)
