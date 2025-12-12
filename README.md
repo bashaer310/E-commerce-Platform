@@ -45,7 +45,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
   - AutoMapper – DTO and entity mapping
     
 - Tools
-  - Swagger / OpenAPI – API documentation
+  - Swagger – API documentation
   - Postman – API testing
 
 ## Getting Started
