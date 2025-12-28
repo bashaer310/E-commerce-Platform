@@ -57,7 +57,7 @@ This is a backend solution for an e-commerce platform, built with C#, ASP.NET, a
 
 2. Navigate to the project folder:
   ```bash
-  E-commerce-Platform
+  cd E-commerce-Platform
   ```
 
 3. Configure Database:
